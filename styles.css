@@ -488,6 +488,11 @@ body.search-view-active .logo i {
     .empty-state h3 {
         font-size: 1.3rem;
     }
+    
+    /* Show library action buttons on mobile */
+    .library-actions-card {
+        opacity: 1 !important;
+    }
 }
 
 .library-card {
@@ -1527,11 +1532,13 @@ body.dark-mode .ad-bottom {
     #data-storage-modal .modal-content {
         max-width: 90%;
         margin: 1rem;
-        max-height: calc(100vh - 100px);
+        max-height: calc(100vh - 120px);
         transform: translateY(-20px);
+        overflow-y: auto;
     }
     
     #data-storage-modal .modal-footer {
-        padding: 1rem 1.5rem 1.5rem 1.5rem;
+        padding: 1rem 1.5rem 2rem 1.5rem;
+        margin-bottom: 20px;
     }
 }
