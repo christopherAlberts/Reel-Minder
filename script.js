@@ -126,6 +126,9 @@ function setupEventListeners() {
     document.getElementById('header-export-data-btn').addEventListener('click', exportData);
     document.getElementById('header-import-data-btn').addEventListener('click', importData);
     document.getElementById('header-show-data-info-btn').addEventListener('click', showDataStorageModal);
+
+    // Load More Recommendations
+    document.getElementById('load-more-recommendations-btn').addEventListener('click', loadMoreRecommendations);
     
     document.getElementById('import-file-input').addEventListener('change', handleFileImport);
     
@@ -868,7 +871,7 @@ async function getRecommendations() {
     }
 }
 
-async function generateHybridRecommendations() {
+async function generateHybridRecommendations(loadMore = false, skipCount = 0) {
     const libraryMovies = currentLibrary.movies;
     const allRecommendations = new Map(); // Use Map to avoid duplicates and track scores
     
@@ -936,10 +939,10 @@ async function generateHybridRecommendations() {
     const libraryIds = new Set(libraryMovies.map(m => `${m.id}-${m.media_type}`));
     const filteredRecommendations = Array.from(allRecommendations.values())
         .filter(rec => !libraryIds.has(`${rec.id}-${rec.media_type}`))
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 20); // Top 20 recommendations
+        .sort((a, b) => b.score - a.score);
     
-    return filteredRecommendations;
+    // Skip already loaded recommendations and return next batch
+    return filteredRecommendations.slice(skipCount, skipCount + 20);
 }
 
 function analyzeGenres(movies) {
@@ -1040,8 +1043,44 @@ async function getGenreBasedRecommendations(topGenres) {
     }
 }
 
+async function loadMoreRecommendations() {
+    if (!currentLibrary) return;
+    
+    const loadMoreBtn = document.getElementById('load-more-recommendations-btn');
+    const originalText = loadMoreBtn.innerHTML;
+    loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading More...';
+    loadMoreBtn.disabled = true;
+    
+    try {
+        const currentRecommendations = currentLibrary.recommendations || [];
+        const skipCount = currentRecommendations.length;
+        const moreRecommendations = await generateHybridRecommendations(true, skipCount);
+        
+        // Append new recommendations to existing ones
+        const allRecommendations = [...currentRecommendations, ...moreRecommendations];
+        
+        // Update library recommendations
+        currentLibrary.recommendations = allRecommendations;
+        saveData();
+        
+        // Update display
+        displayRecommendations(allRecommendations);
+        
+        // Keep load more button visible for additional loads
+        document.getElementById('recommendations-footer').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error loading more recommendations:', error);
+        alert('Failed to load more recommendations. Please try again.');
+    } finally {
+        loadMoreBtn.innerHTML = originalText;
+        loadMoreBtn.disabled = false;
+    }
+}
+
 function displayRecommendations(recommendations) {
     const container = document.getElementById('recommendations-grid');
+    const footer = document.getElementById('recommendations-footer');
     
     if (recommendations.length === 0) {
         container.innerHTML = `
@@ -1051,7 +1090,15 @@ function displayRecommendations(recommendations) {
                 <p>Try adding more movies to your library for better recommendations!</p>
             </div>
         `;
+        footer.style.display = 'none';
         return;
+    }
+    
+    // Show load more button if we have recommendations
+    if (recommendations.length > 0) {
+        footer.style.display = 'block';
+    } else {
+        footer.style.display = 'none';
     }
     
     container.innerHTML = recommendations.map(item => {
