@@ -101,6 +101,7 @@ function setupEventListeners() {
     // Library Detail View
     document.getElementById('back-to-libraries').addEventListener('click', () => switchView('libraries'));
     document.getElementById('add-movie-to-library-btn').addEventListener('click', openSearchFromLibrary);
+    document.getElementById('get-recommendations-btn').addEventListener('click', getRecommendations);
     document.getElementById('edit-library-btn').addEventListener('click', editCurrentLibrary);
     document.getElementById('delete-library-btn').addEventListener('click', deleteCurrentLibrary);
     document.getElementById('share-library-btn').addEventListener('click', shareCurrentLibrary);
@@ -814,6 +815,313 @@ function removeFromLibrary(movieId, mediaType) {
         saveData();
         renderLibraryMovies();
     }
+}
+
+// Recommendations Functionality
+async function getRecommendations() {
+    if (!currentLibrary || currentLibrary.movies.length < 2) {
+        alert('You need at least 2 items in your library to get recommendations!');
+        return;
+    }
+    
+    const recommendationsBtn = document.getElementById('get-recommendations-btn');
+    const originalText = recommendationsBtn.innerHTML;
+    recommendationsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Recommendations...';
+    recommendationsBtn.disabled = true;
+    
+    try {
+        const recommendations = await generateHybridRecommendations();
+        displayRecommendations(recommendations);
+        
+        // Show recommendations section
+        document.getElementById('recommendations-section').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error getting recommendations:', error);
+        alert('Failed to get recommendations. Please try again.');
+    } finally {
+        recommendationsBtn.innerHTML = originalText;
+        recommendationsBtn.disabled = false;
+    }
+}
+
+async function generateHybridRecommendations() {
+    const libraryMovies = currentLibrary.movies;
+    const allRecommendations = new Map(); // Use Map to avoid duplicates and track scores
+    
+    // Step 1: Genre Analysis
+    const genreAnalysis = analyzeGenres(libraryMovies);
+    
+    // Step 2: Get recommendations for each movie/TV show
+    for (const movie of libraryMovies) {
+        try {
+            const movieRecommendations = await getMovieRecommendations(movie.id, movie.media_type);
+            
+            // Add recommendations with scoring
+            movieRecommendations.forEach(rec => {
+                const key = `${rec.id}-${rec.media_type}`;
+                const currentScore = allRecommendations.get(key)?.score || 0;
+                
+                // Base score from TMDB
+                let score = rec.vote_average || 0;
+                
+                // Boost score for matching genres
+                const matchingGenres = rec.genre_ids ? 
+                    rec.genre_ids.filter(id => genreAnalysis.topGenres.includes(id)).length : 0;
+                score += matchingGenres * 0.5;
+                
+                // Boost score for similar release years
+                const movieYear = movie.release_date ? new Date(movie.release_date).getFullYear() : null;
+                const recYear = rec.release_date ? new Date(rec.release_date).getFullYear() : 
+                              rec.first_air_date ? new Date(rec.first_air_date).getFullYear() : null;
+                
+                if (movieYear && recYear && Math.abs(movieYear - recYear) <= 5) {
+                    score += 0.3;
+                }
+                
+                allRecommendations.set(key, {
+                    ...rec,
+                    score: Math.max(currentScore, score),
+                    source: 'hybrid'
+                });
+            });
+            
+        } catch (error) {
+            console.error(`Error getting recommendations for ${movie.title}:`, error);
+        }
+    }
+    
+    // Step 3: Get genre-based recommendations
+    try {
+        const genreRecommendations = await getGenreBasedRecommendations(genreAnalysis.topGenres);
+        
+        genreRecommendations.forEach(rec => {
+            const key = `${rec.id}-${rec.media_type}`;
+            if (!allRecommendations.has(key)) {
+                allRecommendations.set(key, {
+                    ...rec,
+                    score: (rec.vote_average || 0) + 0.2, // Slight boost for genre-based
+                    source: 'genre'
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error getting genre recommendations:', error);
+    }
+    
+    // Step 4: Filter out movies already in library and sort by score
+    const libraryIds = new Set(libraryMovies.map(m => `${m.id}-${m.media_type}`));
+    const filteredRecommendations = Array.from(allRecommendations.values())
+        .filter(rec => !libraryIds.has(`${rec.id}-${rec.media_type}`))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 20); // Top 20 recommendations
+    
+    return filteredRecommendations;
+}
+
+function analyzeGenres(movies) {
+    const genreCounts = new Map();
+    const allGenres = [];
+    
+    movies.forEach(movie => {
+        if (movie.genre_ids && Array.isArray(movie.genre_ids)) {
+            movie.genre_ids.forEach(genreId => {
+                genreCounts.set(genreId, (genreCounts.get(genreId) || 0) + 1);
+                allGenres.push(genreId);
+            });
+        }
+    });
+    
+    // Get top genres (appearing in at least 2 movies or top 3 genres)
+    const sortedGenres = Array.from(genreCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .map(([id]) => id);
+    
+    const topGenres = sortedGenres.slice(0, Math.max(3, Math.min(5, Math.floor(movies.length / 2))));
+    
+    return {
+        genreCounts,
+        topGenres,
+        totalGenres: allGenres.length
+    };
+}
+
+async function getMovieRecommendations(movieId, mediaType) {
+    try {
+        let url;
+        if (hasServerlessFunctions) {
+            url = `/api/recommendations?type=${mediaType}&id=${movieId}`;
+        } else {
+            url = `${API_BASE}/${mediaType}/${movieId}/recommendations?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        return (data.results || []).map(item => ({
+            ...item,
+            media_type: mediaType
+        }));
+    } catch (error) {
+        console.error('Error fetching movie recommendations:', error);
+        return [];
+    }
+}
+
+async function getGenreBasedRecommendations(topGenres) {
+    try {
+        // Get popular movies/TV shows for top genres
+        const recommendations = [];
+        
+        for (const genreId of topGenres.slice(0, 3)) { // Top 3 genres
+            // Get popular movies
+            let movieUrl;
+            if (hasServerlessFunctions) {
+                movieUrl = `/api/discover?type=movie&genre=${genreId}&sort=popularity.desc&page=1`;
+            } else {
+                movieUrl = `${API_BASE}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=1`;
+            }
+            
+            const movieResponse = await fetch(movieUrl);
+            const movieData = await movieResponse.json();
+            
+            if (movieData.results) {
+                recommendations.push(...movieData.results.map(item => ({
+                    ...item,
+                    media_type: 'movie'
+                })));
+            }
+            
+            // Get popular TV shows
+            let tvUrl;
+            if (hasServerlessFunctions) {
+                tvUrl = `/api/discover?type=tv&genre=${genreId}&sort=popularity.desc&page=1`;
+            } else {
+                tvUrl = `${API_BASE}/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=1`;
+            }
+            
+            const tvResponse = await fetch(tvUrl);
+            const tvData = await tvResponse.json();
+            
+            if (tvData.results) {
+                recommendations.push(...tvData.results.map(item => ({
+                    ...item,
+                    media_type: 'tv'
+                })));
+            }
+        }
+        
+        return recommendations;
+    } catch (error) {
+        console.error('Error fetching genre recommendations:', error);
+        return [];
+    }
+}
+
+function displayRecommendations(recommendations) {
+    const container = document.getElementById('recommendations-grid');
+    
+    if (recommendations.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-lightbulb"></i>
+                <h3>No Recommendations Found</h3>
+                <p>Try adding more movies to your library for better recommendations!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = recommendations.map(item => {
+        const releaseYear = item.release_date ? new Date(item.release_date).getFullYear() : 
+                           item.first_air_date ? new Date(item.first_air_date).getFullYear() : 'N/A';
+        const overview = item.overview ? (item.overview.length > 100 ? item.overview.substring(0, 100) + '...' : item.overview) : 'No overview available';
+        
+        return `
+            <div class="movie-card recommendation-card" onclick="showMovieDetails(${item.id}, '${item.media_type}')">
+                <img src="${item.poster_path ? TMDB_IMAGE_BASE_URL + item.poster_path : 'https://via.placeholder.com/300x450?text=No+Image'}" 
+                     alt="${item.title || item.name}" 
+                     class="movie-poster"
+                     onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+                <div class="movie-info">
+                    <div class="movie-title">${item.title || item.name}</div>
+                    <div class="movie-year">${releaseYear}</div>
+                    <div class="movie-rating">
+                        <i class="fas fa-star"></i>
+                        ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}
+                    </div>
+                    <div class="movie-meta">
+                        <div class="movie-type">
+                            <i class="fas ${item.media_type === 'movie' ? 'fa-film' : 'fa-tv'}"></i>
+                            ${item.media_type === 'movie' ? 'Movie' : 'TV Series'}
+                        </div>
+                        <div class="recommendation-source">
+                            <i class="fas fa-lightbulb"></i>
+                            ${item.source === 'hybrid' ? 'Recommended' : 'Genre Match'}
+                        </div>
+                    </div>
+                    <div class="movie-overview">
+                        <p>${overview}</p>
+                    </div>
+                    <div class="movie-actions">
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); addRecommendationToLibrary(${item.id}, '${item.media_type}')">
+                            <i class="fas fa-plus"></i>
+                            Add to Library
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function addRecommendationToLibrary(movieId, mediaType) {
+    if (!currentLibrary) {
+        alert('No library selected');
+        return;
+    }
+    
+    // Find the recommendation data
+    const recommendationCard = document.querySelector(`.recommendation-card[onclick*="${movieId}"]`);
+    if (!recommendationCard) {
+        alert('Recommendation data not found');
+        return;
+    }
+    
+    const img = recommendationCard.querySelector('img');
+    const title = recommendationCard.querySelector('.movie-title').textContent;
+    const year = recommendationCard.querySelector('.movie-year').textContent;
+    const rating = recommendationCard.querySelector('.movie-rating').textContent.trim();
+    
+    // Check if movie already exists in library
+    const existingMovie = currentLibrary.movies.find(m => m.id === movieId && m.media_type === mediaType);
+    if (existingMovie) {
+        alert('This movie is already in the library');
+        return;
+    }
+    
+    // Add movie to library
+    const movieData = {
+        id: movieId,
+        title: title,
+        overview: recommendationCard.querySelector('.movie-overview p').textContent,
+        poster_path: img.src.includes('placeholder') ? null : img.src.replace(TMDB_IMAGE_BASE_URL, ''),
+        vote_average: parseFloat(rating.replace('★', '').trim()) || 0,
+        release_date: year === 'N/A' ? null : year,
+        media_type: mediaType,
+        addedAt: new Date().toISOString(),
+        watched: false
+    };
+    
+    currentLibrary.movies.push(movieData);
+    saveData();
+    
+    // Update UI
+    renderLibraryMovies();
+    
+    // Remove the recommendation card
+    recommendationCard.remove();
+    
+    alert('Movie added to library successfully!');
 }
 
 // Movie Details
