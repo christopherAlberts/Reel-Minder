@@ -1,5 +1,5 @@
 // TMDB API Configuration
-const TMDB_API_KEY = '658c20c1c41f76d429a2f81fa11c9bf0'; // You'll need to get this from https://www.themoviedb.org/settings/api
+const TMDB_API_KEY = window.CONFIG?.TMDB_API_KEY || 'your_tmdb_api_key_here';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 

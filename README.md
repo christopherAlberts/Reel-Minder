@@ -25,10 +25,12 @@ A modern web application for organizing and tracking movies and TV series you wa
 
 ### 2. Configure the Application
 
-1. Open `script.js` in a text editor
-2. Find the line: `const TMDB_API_KEY = 'your_tmdb_api_key_here';`
+1. Copy `config.example.js` to `config.js`
+2. Open `config.js` in a text editor
 3. Replace `'your_tmdb_api_key_here'` with your actual TMDB API key
 4. Save the file
+
+**Security Note**: The `config.js` file is included in `.gitignore` to prevent your API key from being committed to version control. This keeps your API key secure when sharing your code publicly.
 
 ### 3. Run the Application
 
