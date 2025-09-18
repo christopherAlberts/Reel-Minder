@@ -375,6 +375,15 @@ body.dark-mode .dropdown-item:hover {
     font-weight: 600;
 }
 
+/* Make Reel Minder heading bigger when search view is active */
+body.search-view-active .logo {
+    font-size: 2.2rem;
+}
+
+body.search-view-active .logo i {
+    font-size: 2.4rem;
+}
+
 .library-actions {
     display: flex;
     gap: 0.5rem;
@@ -629,6 +638,14 @@ body.dark-mode .dropdown-item:hover {
 .library-actions-card .btn {
     padding: 0.5rem;
     font-size: 0.9rem;
+    background: rgba(0, 0, 0, 0.1);
+    color: #333;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.library-actions-card .btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+    color: #333;
 }
 
 /* Dark mode for library action buttons */
@@ -647,6 +664,7 @@ body.dark-mode .library-actions-card .btn:hover {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
     padding: 2rem;
+    margin-top: 2rem;
     margin-bottom: 2rem;
     backdrop-filter: blur(10px);
 }

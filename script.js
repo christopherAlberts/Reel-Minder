@@ -110,6 +110,12 @@ function setupEventListeners() {
         sortMoviesInLibrary(e.target.value);
     });
 
+    // Settings Navigation Button
+    document.getElementById('settings-nav-btn').addEventListener('click', () => {
+        // Toggle the settings dropdown
+        toggleSettingsDropdown();
+    });
+    
     // Dark Mode Toggle
     document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
     
@@ -190,6 +196,13 @@ function switchView(viewName) {
     }
 
     currentView = viewName;
+
+    // Add/remove body class for search view styling
+    if (viewName === 'search') {
+        document.body.classList.add('search-view-active');
+    } else {
+        document.body.classList.remove('search-view-active');
+    }
 
     // Load appropriate content
     if (viewName === 'libraries') {
