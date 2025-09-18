@@ -1,6 +1,5 @@
 // TMDB API Configuration
-const TMDB_API_KEY = window.CONFIG?.TMDB_API_KEY || 'your_tmdb_api_key_here';
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+// Using Vercel API proxy for secure API key handling
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
 // Application State
@@ -391,15 +390,25 @@ async function performSearch() {
 }
 
 async function searchMovies(query) {
-    const response = await fetch(`${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
-    const data = await response.json();
-    return data.results || [];
+    try {
+        const response = await fetch(`/api/search?type=movie&query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        return data.results || [];
+    } catch (error) {
+        console.error('Movie search error:', error);
+        return [];
+    }
 }
 
 async function searchTVShows(query) {
-    const response = await fetch(`${TMDB_BASE_URL}/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
-    const data = await response.json();
-    return data.results || [];
+    try {
+        const response = await fetch(`/api/search?type=tv&query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        return data.results || [];
+    } catch (error) {
+        console.error('TV search error:', error);
+        return [];
+    }
 }
 
 function renderSearchResults(results) {
@@ -844,23 +853,43 @@ async function showMovieDetails(movieId, mediaType) {
 }
 
 async function fetchMovieDetails(movieId) {
-    const response = await fetch(`${TMDB_BASE_URL}/movie/${movieId}?api_key=${TMDB_API_KEY}`);
-    return await response.json();
+    try {
+        const response = await fetch(`/api/details?type=movie&id=${movieId}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Movie details error:', error);
+        return null;
+    }
 }
 
 async function fetchTVDetails(tvId) {
-    const response = await fetch(`${TMDB_BASE_URL}/tv/${tvId}?api_key=${TMDB_API_KEY}`);
-    return await response.json();
+    try {
+        const response = await fetch(`/api/details?type=tv&id=${tvId}`);
+        return await response.json();
+    } catch (error) {
+        console.error('TV details error:', error);
+        return null;
+    }
 }
 
 async function fetchMovieVideos(movieId) {
-    const response = await fetch(`${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}`);
-    return await response.json();
+    try {
+        const response = await fetch(`/api/videos?type=movie&id=${movieId}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Movie videos error:', error);
+        return null;
+    }
 }
 
 async function fetchTVVideos(tvId) {
-    const response = await fetch(`${TMDB_BASE_URL}/tv/${tvId}/videos?api_key=${TMDB_API_KEY}`);
-    return await response.json();
+    try {
+        const response = await fetch(`/api/videos?type=tv&id=${tvId}`);
+        return await response.json();
+    } catch (error) {
+        console.error('TV videos error:', error);
+        return null;
+    }
 }
 
 function closeMovieModal() {

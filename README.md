@@ -129,11 +129,29 @@ This project is open source and available under the MIT License.
 
 ### Option 2: Vercel (Recommended - Secure API Key)
 **Benefit**: Your API key stays secure, works for all users
-1. Fork this repository
-2. Go to [Vercel](https://vercel.com) and sign up
-3. Import your GitHub repository
-4. Add environment variable: `TMDB_API_KEY` = your actual API key
-5. Deploy automatically
+
+#### Vercel Setup Process:
+1. **Sign up** at [Vercel](https://vercel.com) with your GitHub account
+2. **Click "New Project"** and import your GitHub repository
+3. **Configure Environment Variables**:
+   - Go to Project Settings → Environment Variables
+   - Add new variable: `TMDB_API_KEY`
+   - Set value to your actual TMDB API key
+   - Make sure it's available for Production, Preview, and Development
+4. **Deploy**: Vercel will automatically deploy your project
+5. **Your site is live** at `https://your-project-name.vercel.app`
+
+#### After Deployment:
+- ✅ **API key is secure** on Vercel's servers
+- ✅ **Website works for all users** without setup
+- ✅ **Automatic deployments** on code changes
+- ✅ **Custom domain** available (optional)
+
+#### Code Changes Made:
+- ✅ **Updated `script.js`** to use Vercel API endpoints (`/api/search`, `/api/details`, `/api/videos`)
+- ✅ **Removed client-side API key** requirements
+- ✅ **Added error handling** for API calls
+- ✅ **Ready for production** deployment
 
 ### Option 3: Other Hosting Services
 - **Netlify**: Use Netlify Functions for API proxy
