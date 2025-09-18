@@ -262,33 +262,33 @@ body.dark-mode .sort-select option {
 #add-movie-to-library-btn {
     min-width: 120px !important;
     flex: 0 0 auto;
-    background: #667eea !important;
+    background: #ff6b35 !important;
     color: white !important;
-    border: 2px solid #667eea !important;
+    border: 2px solid #ff6b35 !important;
     font-weight: 600 !important;
 }
 
 #add-movie-to-library-btn:hover {
-    background: #5a6fd8 !important;
-    border-color: #5a6fd8 !important;
+    background: #e55a2b !important;
+    border-color: #e55a2b !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3) !important;
 }
 
 #get-recommendations-btn {
     min-width: 120px !important;
     flex: 0 0 auto;
-    background: #28a745 !important;
+    background: #6c757d !important;
     color: white !important;
-    border: 2px solid #28a745 !important;
+    border: 2px solid #6c757d !important;
     font-weight: 600 !important;
 }
 
 #get-recommendations-btn:hover {
-    background: #218838 !important;
-    border-color: #218838 !important;
+    background: #5a6268 !important;
+    border-color: #5a6268 !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
 }
 
 .library-controls {
