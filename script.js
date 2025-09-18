@@ -113,10 +113,21 @@ function setupEventListeners() {
     // Dark Mode Toggle
     document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
     
-    // Import/Export
+    // Settings Dropdown
+    document.getElementById('settings-btn').addEventListener('click', toggleSettingsDropdown);
     document.getElementById('export-data-btn').addEventListener('click', exportData);
     document.getElementById('import-data-btn').addEventListener('click', importData);
+    document.getElementById('show-data-info-btn').addEventListener('click', showDataStorageModal);
     document.getElementById('import-file-input').addEventListener('change', handleFileImport);
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('settings-dropdown-menu');
+        const settingsBtn = document.getElementById('settings-btn');
+        if (dropdown && !settingsBtn.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
 
     // Search
     document.getElementById('search-btn').addEventListener('click', performSearch);
@@ -1152,6 +1163,14 @@ function toggleWatchedFromDetails(movieId, mediaType, isWatched) {
         
         // Refresh the details page to show updated status
         showMovieDetails(movieId, mediaType);
+    }
+}
+
+// Settings Dropdown Functions
+function toggleSettingsDropdown() {
+    const dropdown = document.getElementById('settings-dropdown-menu');
+    if (dropdown) {
+        dropdown.classList.toggle('show');
     }
 }
 

@@ -250,7 +250,13 @@ body.dark-mode .sort-select option {
 .library-controls-right {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
+}
+
+.library-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .add-btn {
@@ -276,6 +282,69 @@ body.dark-mode .sort-select option {
     align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
+}
+
+/* Settings Dropdown */
+.settings-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 180px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: transparent;
+    color: #333;
+    text-align: left;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+}
+
+/* Dark mode for dropdown */
+body.dark-mode .dropdown-menu {
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .dropdown-item {
+    color: #e0e0e0;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .sort-select {
@@ -1258,6 +1327,15 @@ body.dark-mode .ad-bottom {
     .library-controls-right {
         justify-content: center;
         flex-wrap: wrap;
+    }
+
+    .library-actions-group {
+        gap: 0.25rem;
+    }
+
+    .library-actions-group .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
     }
 
     .libraries-grid {
