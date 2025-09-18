@@ -108,9 +108,10 @@ body.dark-mode .sort-select option {
 /* Removed dark mode btn-secondary overrides - using original styling */
 
 .app-container {
-    min-height: calc(100vh - 80px);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    padding-bottom: 80px;
 }
 
 /* Header Styles */
@@ -366,6 +367,7 @@ body.dark-mode .sort-select option {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
+    padding-top: 1rem;
 }
 
 .library-card {
@@ -1147,8 +1149,9 @@ body.dark-mode .ad-bottom {
 /* Responsive Design */
 @media (max-width: 768px) {
     .app-container {
-        height: calc(100vh - 80px);
+        height: 100vh;
         overflow: hidden;
+        padding-bottom: 80px;
     }
 
     .header {
@@ -1161,11 +1164,18 @@ body.dark-mode .ad-bottom {
         flex-direction: column;
         gap: 0.5rem;
         align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 
     .logo-section {
         text-align: center;
         gap: 0.2rem;
+        align-items: center;
+    }
+
+    .nav {
+        justify-content: center;
     }
 
     .main-content {
