@@ -834,7 +834,16 @@ async function getRecommendations() {
         displayRecommendations(recommendations);
         
         // Show recommendations section
-        document.getElementById('recommendations-section').style.display = 'block';
+        const recommendationsSection = document.getElementById('recommendations-section');
+        recommendationsSection.style.display = 'block';
+        
+        // Scroll to recommendations section with smooth animation
+        setTimeout(() => {
+            recommendationsSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }, 100); // Small delay to ensure the section is visible first
         
     } catch (error) {
         console.error('Error getting recommendations:', error);
