@@ -1718,20 +1718,36 @@ body.dark-mode .ad-bottom {
         gap: 0.75rem;
     }
     
+    /* Line 1: Navigation & Controls (Back + Sort + Layout) */
     .library-controls-left {
         display: flex;
         align-items: center;
         gap: 0.75rem;
         justify-content: center;
         flex-wrap: wrap;
+        order: 1;
     }
     
+    .library-controls-left .layout-switcher {
+        margin: 0;
+    }
+    
+    /* Line 2: Main Action Buttons (Add Movie + Get Recommendations) */
     .library-controls-right {
         display: flex;
         align-items: center;
         gap: 0.75rem;
         justify-content: center;
         flex-wrap: wrap;
+        order: 2;
+    }
+    
+    /* Line 3: Library Management Buttons (Edit + Share + Delete) */
+    .library-actions-group {
+        justify-content: center;
+        gap: 0.5rem;
+        order: 3;
+        margin-top: 0.5rem;
     }
     
     .library-controls-left .btn,
@@ -1739,15 +1755,6 @@ body.dark-mode .ad-bottom {
         padding: 0.6rem 0.8rem !important;
         font-size: 0.8rem !important;
         min-width: auto;
-    }
-    
-    .layout-switcher {
-        margin: 0;
-    }
-    
-    .library-actions-group {
-        justify-content: center;
-        gap: 0.5rem;
     }
     
     .library-actions-group .btn {
