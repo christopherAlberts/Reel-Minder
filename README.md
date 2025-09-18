@@ -118,6 +118,40 @@ This project is open source and available under the MIT License.
 
 ## Contributing
 
+## Deployment Options
+
+### Option 1: GitHub Pages (Static Only)
+**Limitation**: Requires users to add their own API key
+1. Push your code to a GitHub repository
+2. Go to repository Settings → Pages
+3. Select source branch (usually `main`)
+4. Your site will be available at `https://yourusername.github.io/repository-name`
+
+### Option 2: Vercel (Recommended - Secure API Key)
+**Benefit**: Your API key stays secure, works for all users
+1. Fork this repository
+2. Go to [Vercel](https://vercel.com) and sign up
+3. Import your GitHub repository
+4. Add environment variable: `TMDB_API_KEY` = your actual API key
+5. Deploy automatically
+
+### Option 3: Other Hosting Services
+- **Netlify**: Use Netlify Functions for API proxy
+- **Railway**: Deploy with full Node.js support
+- **Render**: Free tier with backend support
+
+## Security Features
+
+### For Repository Owners:
+- ✅ **API key stays secure** on server (Vercel/Railway/etc.)
+- ✅ **No client-side exposure** of sensitive data
+- ✅ **Works for all users** without configuration
+
+### For Repository Users:
+- ✅ **No setup required** - just visit the website
+- ✅ **Full functionality** out of the box
+- ✅ **Secure by default**
+
 Feel free to contribute to this project by:
 - Reporting bugs
 - Suggesting new features
