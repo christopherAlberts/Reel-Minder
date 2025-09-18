@@ -112,6 +112,11 @@ function setupEventListeners() {
 
     // Dark Mode Toggle
     document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
+    
+    // Import/Export
+    document.getElementById('export-data-btn').addEventListener('click', exportData);
+    document.getElementById('import-data-btn').addEventListener('click', importData);
+    document.getElementById('import-file-input').addEventListener('change', handleFileImport);
 
     // Search
     document.getElementById('search-btn').addEventListener('click', performSearch);
@@ -1153,7 +1158,7 @@ function toggleWatchedFromDetails(movieId, mediaType, isWatched) {
 // Data Storage Modal Functions
 function showDataStorageModal() {
     const modal = document.getElementById('data-storage-modal');
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
 }
 
 function closeDataStorageModal() {
@@ -1161,6 +1166,60 @@ function closeDataStorageModal() {
     modal.style.display = 'none';
     // Set a flag so it doesn't show again in this session
     sessionStorage.setItem('dataStorageModalShown', 'true');
+}
+
+// Import/Export Functions
+function exportData() {
+    const data = {
+        libraries: libraries,
+        exportDate: new Date().toISOString(),
+        version: '1.0'
+    };
+    
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `reel-minder-backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    
+    alert('Data exported successfully!');
+}
+
+function importData() {
+    const fileInput = document.getElementById('import-file-input');
+    fileInput.click();
+}
+
+function handleFileImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            if (!importedData.libraries || !Array.isArray(importedData.libraries)) {
+                alert('Invalid file format. Please select a valid Reel Minder backup file.');
+                return;
+            }
+            
+            if (confirm(`This will replace all your current data with ${importedData.libraries.length} libraries from the backup. Are you sure?`)) {
+                libraries = importedData.libraries;
+                saveData();
+                renderLibraries();
+                alert('Data imported successfully!');
+            }
+        } catch (error) {
+            alert('Error reading file. Please make sure it\'s a valid JSON file.');
+        }
+    };
+    
+    reader.readAsText(file);
+    // Reset the input so the same file can be selected again
+    event.target.value = '';
 }
 
 // Initialize share handling

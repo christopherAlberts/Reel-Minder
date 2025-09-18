@@ -264,6 +264,13 @@ body.dark-mode .sort-select option {
     gap: 1rem;
 }
 
+.library-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
 .sort-select {
     padding: 0.75rem 1rem;
     border: 2px solid rgba(255, 255, 255, 0.3);
@@ -777,6 +784,8 @@ body.dark-mode .watched-status:has(.fa-clock) {
     background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     backdrop-filter: blur(5px);
+    align-items: center;
+    justify-content: center;
 }
 
 .modal.active {
@@ -1305,4 +1314,35 @@ body.dark-mode .ad-bottom {
         min-height: 44px;
     }
 
+}
+
+/* Data Storage Modal Specific Styling */
+#data-storage-modal .modal-content {
+    max-width: 500px;
+    margin: 2rem;
+}
+
+#data-storage-modal .modal-body {
+    line-height: 1.6;
+}
+
+#data-storage-modal .modal-body ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+#data-storage-modal .modal-body li {
+    margin: 0.5rem 0;
+}
+
+#data-storage-modal .modal-footer {
+    padding: 1.5rem 1.5rem 2rem 1.5rem;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #e0e0e0;
+}
+
+#data-storage-modal .btn {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
 }
