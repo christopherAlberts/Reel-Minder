@@ -1158,14 +1158,22 @@ function toggleWatchedFromDetails(movieId, mediaType, isWatched) {
 // Data Storage Modal Functions
 function showDataStorageModal() {
     const modal = document.getElementById('data-storage-modal');
-    modal.style.display = 'flex';
+    if (modal) {
+        modal.style.display = 'flex';
+        console.log('Data storage modal shown');
+    } else {
+        console.error('Data storage modal not found');
+    }
 }
 
 function closeDataStorageModal() {
     const modal = document.getElementById('data-storage-modal');
-    modal.style.display = 'none';
-    // Set a flag so it doesn't show again in this session
-    sessionStorage.setItem('dataStorageModalShown', 'true');
+    if (modal) {
+        modal.style.display = 'none';
+        // Set a flag so it doesn't show again in this session
+        sessionStorage.setItem('dataStorageModalShown', 'true');
+        console.log('Data storage modal closed');
+    }
 }
 
 // Import/Export Functions
@@ -1230,6 +1238,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeAds();
     
     // Show data storage modal on first visit
+    // Uncomment the next line to test the modal (clears the session flag)
+    // sessionStorage.removeItem('dataStorageModalShown');
+    
     if (!sessionStorage.getItem('dataStorageModalShown')) {
         setTimeout(() => {
             showDataStorageModal();
