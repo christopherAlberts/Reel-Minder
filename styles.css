@@ -196,7 +196,7 @@ body.dark-mode .sort-select option {
     flex: 1;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem 2rem 5rem 2rem;
+    padding: 1rem 2rem;
     width: 100%;
 }
 
@@ -1116,15 +1116,11 @@ body.dark-mode .watched-status:has(.fa-clock) {
 }
 
 .ad-bottom {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-top: 1px solid rgba(255, 255, 255, 0.2);
-    z-index: 1000;
     padding: 0.5rem 1rem;
+    margin: 0;
 }
 
 
@@ -1159,7 +1155,7 @@ body.dark-mode .ad-bottom {
     }
 
     .main-content {
-        padding: 0.25rem 1rem 0 1rem;
+        padding: 0.25rem 1rem;
         flex: 1;
         overflow-y: auto;
         height: calc(100vh - 120px);
@@ -1248,15 +1244,15 @@ body.dark-mode .ad-bottom {
     }
 
     .ad-bottom {
-        padding: 0.1rem 0.5rem;
-        height: 40px;
+        padding: 0.5rem 1rem;
+        height: 60px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
     .ad-bottom ins {
-        max-height: 30px;
+        max-height: 50px;
     }
 
 }
