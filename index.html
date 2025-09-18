@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reel Minder - Movie & TV Series Tracker</title>
+    <link rel="stylesheet" href="styles.css?v=4.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <h1 class="logo">
+                        <i class="fas fa-film"></i>
+                        Reel Minder
+                    </h1>
+                    <p class="tagline" id="tagline"></p>
+                </div>
+                <nav class="nav">
+                    <button class="nav-btn active" data-view="libraries">
+                        <i class="fas fa-folder"></i>
+                        Libraries
+                    </button>
+                    <button class="nav-btn" data-view="search">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                    <button class="nav-btn" id="dark-mode-toggle">
+                        <i class="fas fa-moon"></i>
+                        Dark Mode
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Libraries View -->
+            <div id="libraries-view" class="view active">
+                <div class="view-header">
+                    <h2>My Libraries</h2>
+                    <div class="library-controls">
+                        <select id="library-sort" class="sort-select">
+                            <option value="name">Sort by Name</option>
+                            <option value="recent">Recently Added</option>
+                            <option value="movies">Most Content</option>
+                        </select>
+                        <button class="btn btn-primary" id="create-library-btn">
+                            <i class="fas fa-plus"></i>
+                            Create Library
+                        </button>
+                    </div>
+                </div>
+                <div class="libraries-grid" id="libraries-grid">
+                    <!-- Libraries will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <!-- Search View -->
+            <div id="search-view" class="view">
+                <div class="search-container">
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Search for movies or TV series...">
+                        <button class="search-btn" id="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="search-filters">
+                        <select id="media-type">
+                            <option value="movie">Movies</option>
+                            <option value="tv">TV Series</option>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="search-results" id="search-results">
+                    <!-- Search results will be displayed here -->
+                </div>
+            </div>
+
+            <!-- Library Detail View -->
+            <div id="library-detail-view" class="view">
+                <div class="library-header">
+                    <h2 id="library-title">Library Name</h2>
+                </div>
+                <div class="library-controls-row">
+                    <div class="library-controls-left">
+                        <button class="btn btn-secondary" id="back-to-libraries">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Libraries
+                        </button>
+                        <select id="movie-sort" class="sort-select">
+                            <option value="name">Sort by Name</option>
+                            <option value="recent">Recently Added</option>
+                            <option value="rating">Highest Rating</option>
+                        </select>
+                    </div>
+                    <div class="library-controls-right">
+                        <button class="btn btn-primary add-btn" id="add-movie-to-library-btn">
+                            <i class="fas fa-plus"></i>
+                            Add
+                        </button>
+                        <button class="btn btn-secondary" id="edit-library-btn">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </button>
+                        <button class="btn btn-danger" id="delete-library-btn">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                        <button class="btn btn-secondary" id="share-library-btn">
+                            <i class="fas fa-share"></i>
+                            Share
+                        </button>
+                    </div>
+                </div>
+                <div class="library-movies" id="library-movies">
+                    <!-- Movies in library will be displayed here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Create/Edit Library Modal -->
+    <div id="library-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="library-modal-title">Create Library</h3>
+                <button class="close-btn" id="close-library-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="library-form">
+                    <div class="form-group">
+                        <label for="library-name">Library Name</label>
+                        <input type="text" id="library-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="library-description">Description (Optional)</label>
+                        <textarea id="library-description" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-library">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Library</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movie Detail Modal -->
+    <div id="movie-modal" class="modal">
+        <div class="modal-content movie-modal-content">
+            <div class="modal-header">
+                <h3 id="movie-modal-title">Details</h3>
+                <button class="close-btn" id="close-movie-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="movie-detail-content" id="movie-detail-content">
+                    <!-- Movie details will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add to Library Modal -->
+    <div id="add-to-library-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add to Library</h3>
+                <button class="close-btn" id="close-add-to-library-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="libraries-list" id="add-to-library-list">
+                    <!-- Available libraries will be listed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Search Movies & TV Series</h3>
+                <button class="close-btn" id="close-search-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="search-container">
+                    <div class="search-box">
+                        <input type="text" id="modal-search-input" placeholder="Search for movies or TV series...">
+                        <button class="search-btn" id="modal-search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="search-filters">
+                        <select id="modal-media-type">
+                            <option value="movie">Movies</option>
+                            <option value="tv">TV Series</option>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="search-results" id="modal-search-results">
+                    <!-- Search results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Share</h3>
+                <button class="close-btn" id="close-share-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="share-content" id="share-content">
+                    <!-- Share content will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=4.0"></script>
+</body>
+</html>
