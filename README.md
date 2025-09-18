@@ -132,14 +132,38 @@ This project is open source and available under the MIT License.
 **Best for**: Static apps, Google Ads integration, custom domains
 
 #### Netlify Setup Process:
-1. **Sign up** at [Netlify](https://netlify.com) with your GitHub account
-2. **Click "New site from Git"** and import your GitHub repository
-3. **Configure Environment Variables**:
-   - Go to Site Settings → Environment Variables
-   - Add new variable: `TMDB_API_KEY`
-   - Set value to your actual TMDB API key
-4. **Deploy**: Netlify will automatically deploy your project
-5. **Your site is live** at `https://your-project-name.netlify.app`
+
+##### Step 1: Create Netlify Account
+1. **Go to** [Netlify](https://netlify.com)
+2. **Sign up** with your GitHub account
+3. **Connect your GitHub** account if prompted
+
+##### Step 2: Deploy Your Repository
+1. **Click "New site from Git"** on Netlify dashboard
+2. **Choose GitHub** as your Git provider
+3. **Select your repository**: `christopherAlberts/Reel-Minder`
+4. **Configure build settings**:
+   - Build command: Leave empty (static site)
+   - Publish directory: Leave empty (root directory)
+5. **Click "Deploy site"**
+
+##### Step 3: Configure Environment Variables
+1. **Go to Site Settings** → **Environment Variables**
+2. **Add new variable**:
+   - Key: `TMDB_API_KEY`
+   - Value: Your actual TMDB API key
+   - Scope: Production, Preview, Development
+3. **Click "Save"**
+
+##### Step 4: Redeploy (Important!)
+1. **Go to Deploys tab**
+2. **Click "Trigger deploy"** → **"Deploy site"**
+3. **Wait for deployment** to complete (2-3 minutes)
+
+##### Step 5: Test Your Site
+1. **Visit your site**: `https://your-project-name.netlify.app`
+2. **Test search functionality** to ensure API works
+3. **Check browser console** for any errors
 
 #### Netlify Benefits:
 - ✅ **100GB bandwidth/month** (free tier)
@@ -148,6 +172,24 @@ This project is open source and available under the MIT License.
 - ✅ **Easy Google Ads integration**
 - ✅ **Form handling** (100 submissions/month)
 - ✅ **Automatic HTTPS**
+- ✅ **Serverless functions** for API calls
+
+#### Custom Domain Setup (Optional):
+1. **Buy a domain** from Namecheap, GoDaddy, or similar
+2. **Go to Site Settings** → **Domain management**
+3. **Add custom domain**: Enter your domain (e.g., `reelminder.com`)
+4. **Configure DNS**:
+   - Add A record: `@` → `75.2.60.5`
+   - Add CNAME record: `www` → `your-site.netlify.app`
+5. **Wait for DNS propagation** (up to 48 hours)
+6. **Enable HTTPS** (automatic with Netlify)
+
+#### Troubleshooting Netlify:
+- **Functions not working?** Check Environment Variables are set correctly
+- **404 errors?** Make sure you redeployed after adding env vars
+- **API key issues?** Verify the exact variable name: `TMDB_API_KEY`
+- **Custom domain not working?** Check DNS settings and wait for propagation
+- **Need help?** Check `NETLIFY_TROUBLESHOOTING.md` in this repository
 
 ### Option 3: Vercel (Good for Dynamic Apps)
 **Best for**: Apps with heavy server-side processing
