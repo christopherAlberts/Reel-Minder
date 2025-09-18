@@ -10,10 +10,12 @@
 1. Once approved, go to AdSense dashboard
 2. Copy your Publisher ID (looks like: `ca-pub-1234567890123456`)
 
-## Step 3: Update Your Code
-Replace `YOUR-PUBLISHER-ID` in these files:
-- `index.html` (2 places)
-- Replace with your actual Publisher ID
+## Step 3: Update Your Code ✅ COMPLETED
+Your Publisher ID `ca-pub-1014136834676352` has been added to:
+- `index.html` (2 places) ✅
+- Auto ads script ✅
+- Banner ad unit ✅
+- Rectangle ad unit ✅
 
 ## Step 4: Create Ad Units (Optional)
 1. In AdSense dashboard, go to "Ads" → "By ad unit"
