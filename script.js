@@ -121,6 +121,7 @@ function setupEventListeners() {
     
     
     // Header Settings Dropdown
+    document.getElementById('header-buy-coffee-btn').addEventListener('click', openBuyMeCoffee);
     document.getElementById('header-export-data-btn').addEventListener('click', exportData);
     document.getElementById('header-import-data-btn').addEventListener('click', importData);
     document.getElementById('header-show-data-info-btn').addEventListener('click', showDataStorageModal);
@@ -1191,6 +1192,20 @@ function toggleHeaderSettingsDropdown() {
     if (dropdown) {
         dropdown.classList.toggle('show');
     }
+}
+
+// Buy Me a Coffee Function
+function openBuyMeCoffee() {
+    // Close the settings dropdown
+    const dropdown = document.getElementById('header-settings-dropdown-menu');
+    if (dropdown) {
+        dropdown.classList.remove('show');
+    }
+    
+    // Open Buy Me a Coffee page in a new tab
+    // You can replace this URL with your actual Buy Me a Coffee page
+    const buyMeCoffeeUrl = 'https://buymeacoffee.com/yourusername'; // Replace with your actual URL
+    window.open(buyMeCoffeeUrl, '_blank');
 }
 
 // Data Storage Modal Functions
