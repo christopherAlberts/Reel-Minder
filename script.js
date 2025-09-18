@@ -746,6 +746,15 @@ function renderLibraryMovies(moviesToRender = null) {
     
     const movies = moviesToRender || currentLibrary.movies;
     const container = document.getElementById('library-movies');
+    const recommendationsSection = document.getElementById('recommendations-section');
+    
+    // Show/hide recommendations section based on whether this library has recommendations
+    if (currentLibrary.recommendations && currentLibrary.recommendations.length > 0) {
+        recommendationsSection.style.display = 'block';
+        displayRecommendations(currentLibrary.recommendations);
+    } else {
+        recommendationsSection.style.display = 'none';
+    }
     
     if (movies.length === 0) {
         container.classList.add('empty');
@@ -831,6 +840,11 @@ async function getRecommendations() {
     
     try {
         const recommendations = await generateHybridRecommendations();
+        
+        // Store recommendations for this specific library
+        currentLibrary.recommendations = recommendations;
+        saveData();
+        
         displayRecommendations(recommendations);
         
         // Show recommendations section
@@ -1122,6 +1136,14 @@ function addRecommendationToLibrary(movieId, mediaType) {
     };
     
     currentLibrary.movies.push(movieData);
+    
+    // Remove the recommendation from the recommendations array
+    if (currentLibrary.recommendations) {
+        currentLibrary.recommendations = currentLibrary.recommendations.filter(rec => 
+            !(rec.id === movieId && rec.media_type === mediaType)
+        );
+    }
+    
     saveData();
     
     // Update UI
