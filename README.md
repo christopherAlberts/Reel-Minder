@@ -128,8 +128,29 @@ This project is open source and available under the MIT License.
 4. Your site will be available at `https://yourusername.github.io/repository-name`
 5. **Users must add their own API key** in `config.js` (see setup instructions above)
 
-### Option 2: Vercel (Recommended - Secure API Key)
-**Benefit**: Your API key stays secure, works for all users
+### Option 2: Netlify (Recommended for Static Apps + Google Ads)
+**Best for**: Static apps, Google Ads integration, custom domains
+
+#### Netlify Setup Process:
+1. **Sign up** at [Netlify](https://netlify.com) with your GitHub account
+2. **Click "New site from Git"** and import your GitHub repository
+3. **Configure Environment Variables**:
+   - Go to Site Settings → Environment Variables
+   - Add new variable: `TMDB_API_KEY`
+   - Set value to your actual TMDB API key
+4. **Deploy**: Netlify will automatically deploy your project
+5. **Your site is live** at `https://your-project-name.netlify.app`
+
+#### Netlify Benefits:
+- ✅ **100GB bandwidth/month** (free tier)
+- ✅ **Custom domains** (free)
+- ✅ **Better for static sites**
+- ✅ **Easy Google Ads integration**
+- ✅ **Form handling** (100 submissions/month)
+- ✅ **Automatic HTTPS**
+
+### Option 3: Vercel (Good for Dynamic Apps)
+**Best for**: Apps with heavy server-side processing
 
 #### Vercel Setup Process:
 1. **Sign up** at [Vercel](https://vercel.com) with your GitHub account
@@ -138,32 +159,42 @@ This project is open source and available under the MIT License.
    - Go to Project Settings → Environment Variables
    - Add new variable: `TMDB_API_KEY`
    - Set value to your actual TMDB API key
-   - Make sure it's available for Production, Preview, and Development
 4. **Deploy**: Vercel will automatically deploy your project
 5. **Your site is live** at `https://your-project-name.vercel.app`
 
-#### After Deployment:
-- ✅ **API key is secure** on Vercel's servers
-- ✅ **Website works for all users** without setup
-- ✅ **Automatic deployments** on code changes
-- ✅ **Custom domain** available (optional)
+#### Vercel Benefits:
+- ✅ **100GB bandwidth/month** (free tier)
+- ✅ **1000 function executions/day** (free tier)
+- ✅ **Custom domains** (free)
+- ✅ **Great for serverless functions**
+- ❌ **Limited function executions** (1000/day)
 
-#### Code Changes Made:
-- ✅ **Auto-detects platform** (Vercel vs GitHub Pages)
-- ✅ **Uses Vercel API endpoints** when on Vercel (`/api/search`, `/api/details`, `/api/videos`)
-- ✅ **Falls back to direct TMDB API** when on GitHub Pages (requires user API key)
-- ✅ **Added error handling** for all API calls
-- ✅ **Works on both platforms** seamlessly
+### Option 4: Other Hosting Services
+- **Railway**: $5 credit/month, full backend support
+- **Render**: 750 hours/month, custom domains
+- **Firebase**: 1GB/day transfer, good for static sites
 
-### Option 3: Other Hosting Services
-- **Netlify**: Use Netlify Functions for API proxy
-- **Railway**: Deploy with full Node.js support
-- **Render**: Free tier with backend support
+## Monetization with Google Ads
+
+### Google AdSense Integration:
+1. **Sign up** for [Google AdSense](https://adsense.google.com)
+2. **Add AdSense code** to your `index.html`:
+   ```html
+   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR-PUBLISHER-ID" crossorigin="anonymous"></script>
+   ```
+3. **Place ad units** in strategic locations (header, sidebar, between content)
+4. **Optimize for revenue** with proper ad placement
+
+### Best Hosting for Monetization:
+- ✅ **Netlify**: Best for static apps with ads
+- ✅ **Custom domain**: Professional appearance (`yourdomain.com`)
+- ✅ **High bandwidth**: 100GB/month (free tier)
+- ✅ **Fast loading**: Better user experience = higher ad revenue
 
 ## Security Features
 
 ### For Repository Owners:
-- ✅ **API key stays secure** on server (Vercel/Railway/etc.)
+- ✅ **API key stays secure** on server (Vercel/Netlify/etc.)
 - ✅ **No client-side exposure** of sensitive data
 - ✅ **Works for all users** without configuration
 
