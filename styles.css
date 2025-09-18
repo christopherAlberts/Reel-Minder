@@ -196,7 +196,7 @@ body.dark-mode .sort-select option {
     flex: 1;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem 2rem;
+    padding: 1rem 2rem 5rem 2rem;
     width: 100%;
 }
 
@@ -1113,9 +1113,16 @@ body.dark-mode .watched-status:has(.fa-clock) {
     padding: 0 1rem;
 }
 
-.ad-top {
-    margin-top: 0.25rem;
-    margin-bottom: 0.5rem;
+.ad-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 1000;
+    padding: 0.5rem 1rem;
 }
 
 .ad-middle {
@@ -1131,6 +1138,11 @@ body.dark-mode .watched-status:has(.fa-clock) {
 }
 
 /* Dark mode for ad containers */
+body.dark-mode .ad-bottom {
+    background: rgba(0, 0, 0, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 body.dark-mode .ad-middle {
     background: rgba(0, 0, 0, 0.3);
 }
@@ -1148,7 +1160,7 @@ body.dark-mode .ad-middle {
     }
 
     .main-content {
-        padding: 0.25rem 1rem;
+        padding: 0.25rem 1rem 4rem 1rem;
     }
 
     .logo-section {
@@ -1232,13 +1244,8 @@ body.dark-mode .ad-middle {
         padding: 0.6rem 0.8rem;
     }
 
-    .ad-container {
-        margin: 0.1rem auto;
-    }
-
-    .ad-top {
-        margin-top: 0;
-        margin-bottom: 0.05rem;
+    .ad-bottom {
+        padding: 0.25rem 0.5rem;
     }
 
     .ad-middle {
