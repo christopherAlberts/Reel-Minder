@@ -32,14 +32,30 @@
                         <i class="fas fa-search"></i>
                         Search
                     </button>
-                    <button class="nav-btn" id="settings-nav-btn">
-                        <i class="fas fa-cog"></i>
-                        Settings
-                    </button>
                     <button class="nav-btn" id="dark-mode-toggle">
                         <i class="fas fa-moon"></i>
                         Dark Mode
                     </button>
+                    <div class="settings-dropdown">
+                        <button class="nav-btn" id="settings-nav-btn">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </button>
+                        <div class="dropdown-menu" id="header-settings-dropdown-menu">
+                            <button class="dropdown-item" id="header-export-data-btn">
+                                <i class="fas fa-download"></i>
+                                Export Data
+                            </button>
+                            <button class="dropdown-item" id="header-import-data-btn">
+                                <i class="fas fa-upload"></i>
+                                Import Data
+                            </button>
+                            <button class="dropdown-item" id="header-show-data-info-btn">
+                                <i class="fas fa-info-circle"></i>
+                                Data Storage Info
+                            </button>
+                        </div>
+                    </div>
                 </nav>
             </div>
         </header>
@@ -61,28 +77,6 @@
                                 <i class="fas fa-plus"></i>
                                 Create Library
                             </button>
-                        </div>
-                        <div class="library-controls-bottom">
-                            <div class="settings-dropdown">
-                                <button class="btn btn-secondary" id="settings-btn">
-                                    <i class="fas fa-cog"></i>
-                                    Settings
-                                </button>
-                                <div class="dropdown-menu" id="settings-dropdown-menu">
-                                    <button class="dropdown-item" id="export-data-btn">
-                                        <i class="fas fa-download"></i>
-                                        Export Data
-                                    </button>
-                                    <button class="dropdown-item" id="import-data-btn">
-                                        <i class="fas fa-upload"></i>
-                                        Import Data
-                                    </button>
-                                    <button class="dropdown-item" id="show-data-info-btn">
-                                        <i class="fas fa-info-circle"></i>
-                                        Data Storage Info
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

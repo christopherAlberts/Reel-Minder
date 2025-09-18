@@ -71,8 +71,8 @@ function setupEventListeners() {
     // Navigation
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // Skip dark mode button
-            if (btn.id === 'dark-mode-toggle') return;
+            // Skip dark mode button and settings button
+            if (btn.id === 'dark-mode-toggle' || btn.id === 'settings-nav-btn') return;
             
             const view = e.target.closest('.nav-btn').dataset.view;
             switchView(view);
@@ -112,26 +112,28 @@ function setupEventListeners() {
 
     // Settings Navigation Button
     document.getElementById('settings-nav-btn').addEventListener('click', () => {
-        // Toggle the settings dropdown
-        toggleSettingsDropdown();
+        // Toggle the header settings dropdown
+        toggleHeaderSettingsDropdown();
     });
     
     // Dark Mode Toggle
     document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
     
-    // Settings Dropdown
-    document.getElementById('settings-btn').addEventListener('click', toggleSettingsDropdown);
-    document.getElementById('export-data-btn').addEventListener('click', exportData);
-    document.getElementById('import-data-btn').addEventListener('click', importData);
-    document.getElementById('show-data-info-btn').addEventListener('click', showDataStorageModal);
+    
+    // Header Settings Dropdown
+    document.getElementById('header-export-data-btn').addEventListener('click', exportData);
+    document.getElementById('header-import-data-btn').addEventListener('click', importData);
+    document.getElementById('header-show-data-info-btn').addEventListener('click', showDataStorageModal);
+    
     document.getElementById('import-file-input').addEventListener('change', handleFileImport);
     
     // Close dropdown when clicking outside
     document.addEventListener('click', function(event) {
-        const dropdown = document.getElementById('settings-dropdown-menu');
-        const settingsBtn = document.getElementById('settings-btn');
-        if (dropdown && !settingsBtn.contains(event.target) && !dropdown.contains(event.target)) {
-            dropdown.classList.remove('show');
+        // Header settings dropdown
+        const headerDropdown = document.getElementById('header-settings-dropdown-menu');
+        const headerSettingsBtn = document.getElementById('settings-nav-btn');
+        if (headerDropdown && !headerSettingsBtn.contains(event.target) && !headerDropdown.contains(event.target)) {
+            headerDropdown.classList.remove('show');
         }
     });
 
@@ -1180,8 +1182,8 @@ function toggleWatchedFromDetails(movieId, mediaType, isWatched) {
 }
 
 // Settings Dropdown Functions
-function toggleSettingsDropdown() {
-    const dropdown = document.getElementById('settings-dropdown-menu');
+function toggleHeaderSettingsDropdown() {
+    const dropdown = document.getElementById('header-settings-dropdown-menu');
     if (dropdown) {
         dropdown.classList.toggle('show');
     }
