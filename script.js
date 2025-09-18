@@ -1142,8 +1142,24 @@ function toggleWatchedFromDetails(movieId, mediaType, isWatched) {
         // Update the UI immediately
         renderLibraryMovies();
         
-        // Refresh the details page to show updated status
-        showMovieDetails(movieId, mediaType);
+        // Update the watched button in the details modal without reloading
+        const watchedButton = document.querySelector('.movie-detail-actions .btn[onclick*="toggleWatchedFromDetails"]');
+        if (watchedButton) {
+            watchedButton.className = `btn ${isWatched ? 'btn-success' : 'btn-watched'}`;
+            const icon = watchedButton.querySelector('i');
+            if (icon) {
+                icon.className = `fas ${isWatched ? 'fa-check-circle' : 'fa-eye'}`;
+            }
+            // Update the onclick to reflect the new state
+            watchedButton.setAttribute('onclick', `toggleWatchedFromDetails(${movieId}, '${mediaType}', ${!isWatched})`);
+        }
+        
+        // Update the watched status badge if it exists
+        const watchedStatus = document.querySelector('.watched-status');
+        if (watchedStatus) {
+            watchedStatus.textContent = isWatched ? 'Watched' : 'Not Watched';
+            watchedStatus.className = `watched-status ${isWatched ? 'watched' : 'unwatched'}`;
+        }
     }
 }
 
