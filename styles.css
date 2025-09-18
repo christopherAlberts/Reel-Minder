@@ -1108,8 +1108,8 @@ body.dark-mode .watched-status:has(.fa-clock) {
 }
 
 .ad-top {
-    margin-top: 1rem;
-    margin-bottom: 2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .ad-middle {
@@ -1144,6 +1144,7 @@ body.dark-mode .ad-middle {
     .view-header {
         flex-direction: column;
         align-items: stretch;
+        margin-bottom: 1rem;
     }
 
     .library-actions {
@@ -1200,6 +1201,23 @@ body.dark-mode .ad-middle {
     }
 
     .movie-actions {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .movie-detail-actions .btn {
+        font-size: 0.8rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .ad-top {
+        margin-top: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .ad-middle {
+        margin: 1rem auto;
+        padding: 0.5rem;
     }
 }
