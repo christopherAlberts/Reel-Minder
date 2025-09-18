@@ -71,8 +71,8 @@ function setupEventListeners() {
     // Navigation
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // Skip dark mode button and settings button
-            if (btn.id === 'dark-mode-toggle' || btn.id === 'settings-nav-btn') return;
+            // Skip settings button
+            if (btn.id === 'settings-nav-btn') return;
             
             const view = e.target.closest('.nav-btn').dataset.view;
             switchView(view);
@@ -116,8 +116,8 @@ function setupEventListeners() {
         toggleHeaderSettingsDropdown();
     });
     
-    // Dark Mode Toggle
-    document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
+    // Dark Mode Toggle (now in settings dropdown)
+    document.getElementById('header-dark-mode-toggle').addEventListener('click', toggleDarkMode);
     
     
     // Header Settings Dropdown
@@ -1126,7 +1126,7 @@ function handleShareParams() {
 // Dark Mode Functions
 function toggleDarkMode() {
     const body = document.body;
-    const toggle = document.getElementById('dark-mode-toggle');
+    const toggle = document.getElementById('header-dark-mode-toggle');
     const icon = toggle.querySelector('i');
     
     body.classList.toggle('dark-mode');
@@ -1144,7 +1144,7 @@ function toggleDarkMode() {
 
 function initializeDarkMode() {
     const darkMode = localStorage.getItem('darkMode') === 'true';
-    const toggle = document.getElementById('dark-mode-toggle');
+    const toggle = document.getElementById('header-dark-mode-toggle');
     
     if (darkMode) {
         document.body.classList.add('dark-mode');
