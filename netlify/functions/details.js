@@ -1,4 +1,4 @@
-// Netlify function for TMDB search
+// Netlify function for TMDB details
 const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
@@ -25,13 +25,13 @@ exports.handler = async (event, context) => {
         };
     }
 
-    const { type, query } = event.queryStringParameters || {};
+    const { type, id } = event.queryStringParameters || {};
 
-    if (!type || !query) {
+    if (!type || !id) {
         return {
             statusCode: 400,
             headers,
-            body: JSON.stringify({ error: 'Missing type or query parameter' }),
+            body: JSON.stringify({ error: 'Missing type or id parameter' }),
         };
     }
 
@@ -55,7 +55,7 @@ exports.handler = async (event, context) => {
         }
 
         const response = await fetch(
-            `https://api.themoviedb.org/3/search/${type}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`
+            `https://api.themoviedb.org/3/${type}/${id}?api_key=${TMDB_API_KEY}`
         );
 
         if (!response.ok) {
@@ -70,11 +70,11 @@ exports.handler = async (event, context) => {
             body: JSON.stringify(data),
         };
     } catch (error) {
-        console.error('Search error:', error);
+        console.error('Details error:', error);
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: 'Search failed' }),
+            body: JSON.stringify({ error: 'Details fetch failed' }),
         };
     }
 };

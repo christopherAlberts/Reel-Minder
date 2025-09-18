@@ -2,10 +2,13 @@
 // Auto-detect deployment platform and use appropriate API endpoints
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
-// Check if we're on Vercel (has API functions) or GitHub Pages (needs direct API)
+// Check if we're on Vercel, Netlify, or GitHub Pages
 const isVercel = window.location.hostname.includes('vercel.app');
-const API_BASE = isVercel ? '' : 'https://api.themoviedb.org/3';
-const API_KEY = isVercel ? '' : (window.CONFIG?.TMDB_API_KEY || 'your_tmdb_api_key_here');
+const isNetlify = window.location.hostname.includes('netlify.app');
+const hasServerlessFunctions = isVercel || isNetlify;
+
+const API_BASE = hasServerlessFunctions ? '' : 'https://api.themoviedb.org/3';
+const API_KEY = hasServerlessFunctions ? '' : (window.CONFIG?.TMDB_API_KEY || 'your_tmdb_api_key_here');
 
 // Application State
 let currentView = 'libraries';
@@ -408,7 +411,7 @@ async function performSearch() {
 async function searchMovies(query) {
     try {
         let url;
-        if (isVercel) {
+        if (hasServerlessFunctions) {
             url = `/api/search?type=movie&query=${encodeURIComponent(query)}`;
         } else {
             url = `${API_BASE}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
@@ -426,7 +429,7 @@ async function searchMovies(query) {
 async function searchTVShows(query) {
     try {
         let url;
-        if (isVercel) {
+        if (hasServerlessFunctions) {
             url = `/api/search?type=tv&query=${encodeURIComponent(query)}`;
         } else {
             url = `${API_BASE}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
@@ -885,7 +888,7 @@ async function showMovieDetails(movieId, mediaType) {
 async function fetchMovieDetails(movieId) {
     try {
         let url;
-        if (isVercel) {
+        if (hasServerlessFunctions) {
             url = `/api/details?type=movie&id=${movieId}`;
         } else {
             url = `${API_BASE}/movie/${movieId}?api_key=${API_KEY}`;
@@ -902,7 +905,7 @@ async function fetchMovieDetails(movieId) {
 async function fetchTVDetails(tvId) {
     try {
         let url;
-        if (isVercel) {
+        if (hasServerlessFunctions) {
             url = `/api/details?type=tv&id=${tvId}`;
         } else {
             url = `${API_BASE}/tv/${tvId}?api_key=${API_KEY}`;
@@ -919,7 +922,7 @@ async function fetchTVDetails(tvId) {
 async function fetchMovieVideos(movieId) {
     try {
         let url;
-        if (isVercel) {
+        if (hasServerlessFunctions) {
             url = `/api/videos?type=movie&id=${movieId}`;
         } else {
             url = `${API_BASE}/movie/${movieId}/videos?api_key=${API_KEY}`;
@@ -936,7 +939,7 @@ async function fetchMovieVideos(movieId) {
 async function fetchTVVideos(tvId) {
     try {
         let url;
-        if (isVercel) {
+        if (hasServerlessFunctions) {
             url = `/api/videos?type=tv&id=${tvId}`;
         } else {
             url = `${API_BASE}/tv/${tvId}/videos?api_key=${API_KEY}`;
