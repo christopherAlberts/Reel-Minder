@@ -262,6 +262,17 @@ body.dark-mode .sort-select option {
 .add-btn {
     min-width: 120px !important;
     flex: 0 0 auto;
+    background: #667eea !important;
+    color: white !important;
+    border: 2px solid #667eea !important;
+    font-weight: 600 !important;
+}
+
+.add-btn:hover {
+    background: #5a6fd8 !important;
+    border-color: #5a6fd8 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
 }
 
 .library-controls {
