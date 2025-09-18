@@ -1728,7 +1728,7 @@ body.dark-mode .ad-bottom {
         order: 1;
     }
     
-    /* Line 2: All Actions (Add Movie + Get Recommendations + Edit + Share + Delete + Layout) */
+    /* Line 2: Main Actions (Add Movie + Get Recommendations) */
     .library-controls-right {
         display: flex;
         align-items: center;
@@ -1736,6 +1736,15 @@ body.dark-mode .ad-bottom {
         justify-content: center;
         flex-wrap: wrap;
         order: 2;
+    }
+    
+    /* Line 3: Library Management + Layout (Edit + Share + Delete + Layout) */
+    .library-controls-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        order: 3;
+        margin-top: 0.5rem;
     }
     
     .library-actions-group {

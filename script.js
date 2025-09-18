@@ -42,6 +42,13 @@ function loadData() {
     if (savedData) {
         const data = JSON.parse(savedData);
         libraries = data.libraries || [];
+        
+        // Ensure all library names start with capital letters
+        libraries.forEach(library => {
+            if (library.name) {
+                library.name = capitalizeFirstLetter(library.name);
+            }
+        });
     } else {
         // Create default library
         libraries = [{
@@ -65,6 +72,11 @@ function saveData() {
 
 function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+function capitalizeFirstLetter(str) {
+    if (!str || typeof str !== 'string') return str;
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 function switchLayout(layout) {
@@ -339,7 +351,7 @@ function renderLibraries(librariesToRender = libraries) {
             <div class="library-card" onclick="showLibraryDetail('${library.id}')">
                 <div class="library-card-header">
                     <div>
-                        <div class="library-name">${library.name}</div>
+                        <div class="library-name">${capitalizeFirstLetter(library.name)}</div>
                         <div class="library-count">${library.movies.length} items</div>
                     </div>
                     <div class="library-actions-card">

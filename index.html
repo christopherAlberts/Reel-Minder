@@ -130,40 +130,42 @@
                         </select>
                     </div>
                 <div class="library-controls-right">
-                        <div class="library-actions-group">
-                            <button class="btn btn-primary add-btn" id="add-movie-to-library-btn">
-                                <i class="fas fa-plus"></i>
-                                Add Movie or TV
+                    <button class="btn btn-primary add-btn" id="add-movie-to-library-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Movie or TV
+                    </button>
+                    <button class="btn btn-secondary" id="get-recommendations-btn">
+                        <i class="fas fa-lightbulb"></i>
+                        Get Recommendations
+                    </button>
+                </div>
+                <div class="library-controls-bottom">
+                    <div class="library-actions-group">
+                        <button class="btn btn-secondary" id="edit-library-btn">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </button>
+                        <button class="btn btn-secondary" id="share-library-btn">
+                            <i class="fas fa-share"></i>
+                            Share
+                        </button>
+                        <button class="btn btn-danger" id="delete-library-btn">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                        <div class="layout-switcher">
+                            <button class="layout-btn active" data-layout="grid" title="Grid View">
+                                <i class="fas fa-th"></i>
                             </button>
-                            <button class="btn btn-secondary" id="get-recommendations-btn">
-                                <i class="fas fa-lightbulb"></i>
-                                Get Recommendations
+                            <button class="layout-btn" data-layout="poster" title="Poster View">
+                                <i class="fas fa-image"></i>
                             </button>
-                            <button class="btn btn-secondary" id="edit-library-btn">
-                                <i class="fas fa-edit"></i>
-                                Edit
+                            <button class="layout-btn" data-layout="list" title="List View">
+                                <i class="fas fa-list"></i>
                             </button>
-                            <button class="btn btn-secondary" id="share-library-btn">
-                                <i class="fas fa-share"></i>
-                                Share
-                            </button>
-                            <button class="btn btn-danger" id="delete-library-btn">
-                                <i class="fas fa-trash"></i>
-                                Delete
-                            </button>
-                            <div class="layout-switcher">
-                                <button class="layout-btn active" data-layout="grid" title="Grid View">
-                                    <i class="fas fa-th"></i>
-                                </button>
-                                <button class="layout-btn" data-layout="poster" title="Poster View">
-                                    <i class="fas fa-image"></i>
-                                </button>
-                                <button class="layout-btn" data-layout="list" title="List View">
-                                    <i class="fas fa-list"></i>
-                                </button>
-                            </div>
                         </div>
                     </div>
+                </div>
                 </div>
                 <div class="library-movies" id="library-movies">
                     <!-- Movies in library will be displayed here -->
