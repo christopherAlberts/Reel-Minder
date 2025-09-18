@@ -1728,7 +1728,7 @@ body.dark-mode .ad-bottom {
         order: 1;
     }
     
-    /* Line 2: Main Action Buttons (Add Movie + Get Recommendations) */
+    /* Line 2: All Actions (Add Movie + Get Recommendations + Edit + Share + Delete + Layout) */
     .library-controls-right {
         display: flex;
         align-items: center;
@@ -1738,12 +1738,9 @@ body.dark-mode .ad-bottom {
         order: 2;
     }
     
-    /* Line 3: Library Management + Layout (Edit + Share + Delete + Layout) */
     .library-actions-group {
         justify-content: center;
         gap: 0.5rem;
-        order: 3;
-        margin-top: 0.5rem;
         flex-wrap: wrap;
     }
     
@@ -1751,8 +1748,7 @@ body.dark-mode .ad-bottom {
         margin: 0;
     }
     
-    .library-controls-left .btn,
-    .library-controls-right .btn {
+    .library-controls-left .btn {
         padding: 0.6rem 0.8rem !important;
         font-size: 0.8rem !important;
         min-width: auto;
@@ -1761,6 +1757,7 @@ body.dark-mode .ad-bottom {
     .library-actions-group .btn {
         padding: 0.5rem 0.7rem !important;
         font-size: 0.75rem !important;
+        min-width: auto;
     }
     
     /* Mobile list view adjustments */
