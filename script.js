@@ -253,6 +253,7 @@ function renderLibraries(librariesToRender = libraries) {
     const grid = document.getElementById('libraries-grid');
     
     if (librariesToRender.length === 0) {
+        grid.classList.add('empty');
         grid.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-folder-open"></i>
@@ -263,6 +264,7 @@ function renderLibraries(librariesToRender = libraries) {
         return;
     }
 
+    grid.classList.remove('empty');
     grid.innerHTML = librariesToRender.map(library => {
         const moviePreviews = library.movies.slice(0, 4); // Show up to 4 movie previews
         const remainingCount = Math.max(0, library.movies.length - 4);

@@ -462,6 +462,34 @@ body.search-view-active .logo i {
     padding-top: 1rem;
 }
 
+/* Center empty state within grid */
+.libraries-grid.empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+/* Mobile adjustments for empty state */
+@media (max-width: 768px) {
+    .libraries-grid.empty {
+        min-height: 300px;
+        padding: 1rem;
+    }
+    
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.3rem;
+    }
+}
+
 .library-card {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
