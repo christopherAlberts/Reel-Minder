@@ -680,6 +680,9 @@ function addToCurrentLibrary(movieId, mediaType) {
     // Update UI
     renderLibraryMovies();
     
+    // Close the search modal
+    closeSearchModal();
+    
     alert('Movie added to library successfully!');
 }
 
@@ -1147,10 +1150,32 @@ function toggleWatchedFromDetails(movieId, mediaType, isWatched) {
     }
 }
 
+// Data Storage Modal Functions
+function showDataStorageModal() {
+    const modal = document.getElementById('data-storage-modal');
+    modal.style.display = 'block';
+}
+
+function closeDataStorageModal() {
+    const modal = document.getElementById('data-storage-modal');
+    modal.style.display = 'none';
+    // Set a flag so it doesn't show again in this session
+    sessionStorage.setItem('dataStorageModalShown', 'true');
+}
+
 // Initialize share handling
 document.addEventListener('DOMContentLoaded', function() {
     handleShareParams();
     initializeDarkMode();
+    displayRandomTagline();
+    initializeAds();
+    
+    // Show data storage modal on first visit
+    if (!sessionStorage.getItem('dataStorageModalShown')) {
+        setTimeout(() => {
+            showDataStorageModal();
+        }, 1000); // Show after 1 second
+    }
 });
 
 // Display Random Tagline

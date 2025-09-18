@@ -1131,6 +1131,7 @@ body.dark-mode .watched-status:has(.fa-clock) {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0;
 }
 
 
@@ -1273,6 +1274,25 @@ body.dark-mode .ad-bottom {
 
     .ad-bottom ins {
         max-height: 60px;
+    }
+
+    /* Bigger buttons on mobile */
+    .btn {
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        min-height: 44px;
+    }
+
+    .movie-actions .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+        min-height: 40px;
+    }
+
+    .search-results .btn {
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        min-height: 44px;
     }
 
 }
