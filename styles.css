@@ -493,6 +493,12 @@ body.search-view-active .logo i {
     .library-actions-card {
         opacity: 1 !important;
     }
+    
+    /* Mobile adjustments for library movies empty state */
+    .library-movies.empty {
+        min-height: 300px;
+        padding: 1rem;
+    }
 }
 
 .library-card {
@@ -909,6 +915,14 @@ body.dark-mode .watched-status:has(.fa-clock) {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+}
+
+/* Center empty state within library movies grid */
+.library-movies.empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
 }
 
 /* Modal Styles */

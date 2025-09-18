@@ -746,6 +746,7 @@ function renderLibraryMovies(moviesToRender = null) {
     const container = document.getElementById('library-movies');
     
     if (movies.length === 0) {
+        container.classList.add('empty');
         container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-film"></i>
@@ -756,6 +757,7 @@ function renderLibraryMovies(moviesToRender = null) {
         return;
     }
     
+    container.classList.remove('empty');
     container.innerHTML = movies.map(movie => {
         const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A';
         const addedDate = movie.addedAt ? new Date(movie.addedAt).toLocaleDateString() : 'N/A';
