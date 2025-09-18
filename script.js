@@ -1203,8 +1203,7 @@ function openBuyMeCoffee() {
     }
     
     // Open Buy Me a Coffee page in a new tab
-    // You can replace this URL with your actual Buy Me a Coffee page
-    const buyMeCoffeeUrl = 'https://buymeacoffee.com/yourusername'; // Replace with your actual URL
+    const buyMeCoffeeUrl = 'https://buymeacoffee.com/streblainnovations';
     window.open(buyMeCoffeeUrl, '_blank');
 }
 
