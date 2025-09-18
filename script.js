@@ -1,6 +1,11 @@
 // TMDB API Configuration
-// Using Vercel API proxy for secure API key handling
+// Auto-detect deployment platform and use appropriate API endpoints
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+
+// Check if we're on Vercel (has API functions) or GitHub Pages (needs direct API)
+const isVercel = window.location.hostname.includes('vercel.app');
+const API_BASE = isVercel ? '' : 'https://api.themoviedb.org/3';
+const API_KEY = isVercel ? '' : (window.CONFIG?.TMDB_API_KEY || 'your_tmdb_api_key_here');
 
 // Application State
 let currentView = 'libraries';
@@ -391,7 +396,14 @@ async function performSearch() {
 
 async function searchMovies(query) {
     try {
-        const response = await fetch(`/api/search?type=movie&query=${encodeURIComponent(query)}`);
+        let url;
+        if (isVercel) {
+            url = `/api/search?type=movie&query=${encodeURIComponent(query)}`;
+        } else {
+            url = `${API_BASE}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         return data.results || [];
     } catch (error) {
@@ -402,7 +414,14 @@ async function searchMovies(query) {
 
 async function searchTVShows(query) {
     try {
-        const response = await fetch(`/api/search?type=tv&query=${encodeURIComponent(query)}`);
+        let url;
+        if (isVercel) {
+            url = `/api/search?type=tv&query=${encodeURIComponent(query)}`;
+        } else {
+            url = `${API_BASE}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         return data.results || [];
     } catch (error) {
@@ -854,7 +873,14 @@ async function showMovieDetails(movieId, mediaType) {
 
 async function fetchMovieDetails(movieId) {
     try {
-        const response = await fetch(`/api/details?type=movie&id=${movieId}`);
+        let url;
+        if (isVercel) {
+            url = `/api/details?type=movie&id=${movieId}`;
+        } else {
+            url = `${API_BASE}/movie/${movieId}?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
         return await response.json();
     } catch (error) {
         console.error('Movie details error:', error);
@@ -864,7 +890,14 @@ async function fetchMovieDetails(movieId) {
 
 async function fetchTVDetails(tvId) {
     try {
-        const response = await fetch(`/api/details?type=tv&id=${tvId}`);
+        let url;
+        if (isVercel) {
+            url = `/api/details?type=tv&id=${tvId}`;
+        } else {
+            url = `${API_BASE}/tv/${tvId}?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
         return await response.json();
     } catch (error) {
         console.error('TV details error:', error);
@@ -874,7 +907,14 @@ async function fetchTVDetails(tvId) {
 
 async function fetchMovieVideos(movieId) {
     try {
-        const response = await fetch(`/api/videos?type=movie&id=${movieId}`);
+        let url;
+        if (isVercel) {
+            url = `/api/videos?type=movie&id=${movieId}`;
+        } else {
+            url = `${API_BASE}/movie/${movieId}/videos?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
         return await response.json();
     } catch (error) {
         console.error('Movie videos error:', error);
@@ -884,7 +924,14 @@ async function fetchMovieVideos(movieId) {
 
 async function fetchTVVideos(tvId) {
     try {
-        const response = await fetch(`/api/videos?type=tv&id=${tvId}`);
+        let url;
+        if (isVercel) {
+            url = `/api/videos?type=tv&id=${tvId}`;
+        } else {
+            url = `${API_BASE}/tv/${tvId}/videos?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
         return await response.json();
     } catch (error) {
         console.error('TV videos error:', error);

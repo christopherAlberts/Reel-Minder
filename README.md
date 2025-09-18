@@ -121,11 +121,12 @@ This project is open source and available under the MIT License.
 ## Deployment Options
 
 ### Option 1: GitHub Pages (Static Only)
-**Limitation**: Requires users to add their own API key
+**Note**: Now works with auto-detection! Users need their own API key.
 1. Push your code to a GitHub repository
 2. Go to repository Settings → Pages
 3. Select source branch (usually `main`)
 4. Your site will be available at `https://yourusername.github.io/repository-name`
+5. **Users must add their own API key** in `config.js` (see setup instructions above)
 
 ### Option 2: Vercel (Recommended - Secure API Key)
 **Benefit**: Your API key stays secure, works for all users
@@ -148,10 +149,11 @@ This project is open source and available under the MIT License.
 - ✅ **Custom domain** available (optional)
 
 #### Code Changes Made:
-- ✅ **Updated `script.js`** to use Vercel API endpoints (`/api/search`, `/api/details`, `/api/videos`)
-- ✅ **Removed client-side API key** requirements
-- ✅ **Added error handling** for API calls
-- ✅ **Ready for production** deployment
+- ✅ **Auto-detects platform** (Vercel vs GitHub Pages)
+- ✅ **Uses Vercel API endpoints** when on Vercel (`/api/search`, `/api/details`, `/api/videos`)
+- ✅ **Falls back to direct TMDB API** when on GitHub Pages (requires user API key)
+- ✅ **Added error handling** for all API calls
+- ✅ **Works on both platforms** seamlessly
 
 ### Option 3: Other Hosting Services
 - **Netlify**: Use Netlify Functions for API proxy
