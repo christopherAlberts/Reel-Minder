@@ -1179,6 +1179,16 @@ body.dark-mode .ad-bottom {
         justify-content: center;
     }
 
+    .nav-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        min-height: 32px;
+    }
+
+    .nav-btn i {
+        font-size: 0.9rem;
+    }
+
     .main-content {
         padding: 0.25rem 1rem 3rem 1rem;
         flex: 1;
