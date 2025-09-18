@@ -875,10 +875,10 @@ body.dark-mode .library-actions-card .btn:hover {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Reduce hover movement for list view */
+/* Minimize hover movement for list view */
 .library-movies.list-view .movie-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .movie-card.watched {
