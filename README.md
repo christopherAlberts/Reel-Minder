@@ -2,6 +2,8 @@
 
 A modern web application for organizing and tracking movies and TV series you want to watch. Create custom libraries, search for content using The Movie Database (TMDB) API, and share your collections with others.
 
+🌐 **Live Demo**: [reel-minder.netlify.app](https://reel-minder.netlify.app)
+
 ## Features
 
 - 🎬 **Custom Libraries**: Create, edit, and manage multiple libraries for different categories
