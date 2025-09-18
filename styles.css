@@ -1728,21 +1728,22 @@ body.dark-mode .ad-bottom {
         order: 1;
     }
     
-    /* Line 2: Main Actions (Add Movie + Get Recommendations) */
+    /* Line 2: Library Management + Layout (Edit + Share + Layout + Delete) */
+    .library-controls-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        order: 2;
+        margin-top: 0.5rem;
+    }
+    
+    /* Line 3: Main Actions (Add Movie + Get Recommendations) */
     .library-controls-right {
         display: flex;
         align-items: center;
         gap: 0.75rem;
         justify-content: center;
         flex-wrap: wrap;
-        order: 2;
-    }
-    
-    /* Line 3: Library Management + Layout (Edit + Share + Delete + Layout) */
-    .library-controls-bottom {
-        display: flex;
-        align-items: center;
-        justify-content: center;
         order: 3;
         margin-top: 0.5rem;
     }
