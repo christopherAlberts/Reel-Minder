@@ -20,6 +20,7 @@ let searchResults = [];
 document.addEventListener('DOMContentLoaded', function() {
     loadData();
     setupEventListeners();
+    initializeLayout();
     renderLibraries();
     displayRandomTagline();
     initializeAds();
@@ -64,6 +65,58 @@ function saveData() {
 
 function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+function switchLayout(layout) {
+    // Update active button
+    document.querySelectorAll('.layout-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-layout="${layout}"]`).classList.add('active');
+    
+    // Apply layout to current library movies container
+    const container = document.getElementById('library-movies');
+    if (container) {
+        // Remove all layout classes
+        container.classList.remove('grid-view', 'poster-view', 'list-view');
+        
+        // Add new layout class
+        container.classList.add(`${layout}-view`);
+        
+        // Save layout preference
+        localStorage.setItem('preferredLayout', layout);
+    }
+}
+
+function applyLayout(container, layout) {
+    if (container) {
+        // Remove all layout classes
+        container.classList.remove('grid-view', 'poster-view', 'list-view');
+        
+        // Add new layout class
+        container.classList.add(`${layout}-view`);
+    }
+}
+
+function initializeLayout() {
+    // Load saved layout preference or default to grid
+    const savedLayout = localStorage.getItem('preferredLayout') || 'grid';
+    
+    // Update active button
+    document.querySelectorAll('.layout-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const activeBtn = document.querySelector(`[data-layout="${savedLayout}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+    
+    // Apply layout to any existing library movies container
+    const container = document.getElementById('library-movies');
+    if (container) {
+        applyLayout(container, savedLayout);
+    }
 }
 
 // Event Listeners
@@ -129,6 +182,14 @@ function setupEventListeners() {
 
     // Load More Recommendations
     document.getElementById('load-more-recommendations-btn').addEventListener('click', loadMoreRecommendations);
+
+    // Layout Switcher
+    document.querySelectorAll('.layout-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const layout = this.dataset.layout;
+            switchLayout(layout);
+        });
+    });
     
     document.getElementById('import-file-input').addEventListener('change', handleFileImport);
     
