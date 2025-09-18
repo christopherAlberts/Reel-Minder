@@ -19,7 +19,18 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     renderLibraries();
     displayRandomTagline();
+    initializeAds();
 });
+
+// Initialize Google AdSense ads
+function initializeAds() {
+    try {
+        // Initialize all ad units
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (error) {
+        console.log('AdSense not configured yet:', error);
+    }
+}
 
 // Data Management
 function loadData() {

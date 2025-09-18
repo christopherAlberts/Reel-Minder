@@ -1099,6 +1099,36 @@ body.dark-mode .watched-status:has(.fa-clock) {
     opacity: 0.8;
 }
 
+/* Google AdSense Styling */
+.ad-container {
+    margin: 1rem auto;
+    text-align: center;
+    max-width: 1200px;
+    padding: 0 1rem;
+}
+
+.ad-top {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.ad-middle {
+    margin: 2rem auto;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.ad-container ins {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Dark mode for ad containers */
+body.dark-mode .ad-middle {
+    background: rgba(0, 0, 0, 0.3);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .header-content {
