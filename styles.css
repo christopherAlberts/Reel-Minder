@@ -1125,12 +1125,6 @@ body.dark-mode .watched-status:has(.fa-clock) {
     padding: 0.5rem 1rem;
 }
 
-.ad-middle {
-    margin: 2rem auto;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-}
 
 .ad-container ins {
     display: block;
@@ -1143,9 +1137,6 @@ body.dark-mode .ad-bottom {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-body.dark-mode .ad-middle {
-    background: rgba(0, 0, 0, 0.3);
-}
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -1248,8 +1239,4 @@ body.dark-mode .ad-middle {
         padding: 0.25rem 0.5rem;
     }
 
-    .ad-middle {
-        margin: 1rem auto;
-        padding: 0.5rem;
-    }
 }
