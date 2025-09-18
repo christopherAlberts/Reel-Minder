@@ -212,6 +212,7 @@ body.dark-mode .sort-select option {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 1.5rem;
     margin-bottom: 1rem;
     flex-wrap: wrap;
     gap: 1rem;
@@ -219,6 +220,7 @@ body.dark-mode .sort-select option {
 
 /* Library Detail Layout */
 .library-header {
+    margin-top: 1.5rem;
     margin-bottom: 1.5rem;
 }
 
@@ -1170,6 +1172,7 @@ body.dark-mode .ad-bottom {
     .view-header {
         flex-direction: column;
         align-items: stretch;
+        margin-top: 1rem;
         margin-bottom: 0.5rem;
     }
 
