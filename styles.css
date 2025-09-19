@@ -42,6 +42,10 @@ body.dark-mode .nav-btn.active {
     color: white;
 }
 
+body.dark-mode .nav-btn[data-view="find-something"] {
+    color: white;
+}
+
 body.dark-mode .library-card {
     background: rgba(0, 0, 0, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -186,6 +190,7 @@ body.dark-mode .sort-select option {
 /* Reduce gap for Find Something to Watch button */
 .nav-btn[data-view="find-something"] {
     gap: 0.3rem;
+    color: white;
 }
 
 .nav-btn:hover {
