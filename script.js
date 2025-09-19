@@ -1509,7 +1509,7 @@ async function showEpisodes(tvId) {
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                         </div>
-                        <div class="season-overview">
+                        <div class="season-overview" id="overview-${season.season_number}" style="display: none;">
                             ${season.overview || 'No overview available.'}
                         </div>
                         <div class="season-episodes" id="episodes-${season.season_number}" style="display: none;">
@@ -1664,10 +1664,12 @@ async function showEpisodeDetails(tvId, seasonNumber, episodeNumber) {
 
 async function toggleSeasonEpisodes(tvId, seasonNumber, seasonName) {
     const episodesContainer = document.getElementById(`episodes-${seasonNumber}`);
+    const overviewContainer = document.getElementById(`overview-${seasonNumber}`);
     const toggleIcon = episodesContainer.previousElementSibling.previousElementSibling.querySelector('.season-toggle i');
     
     if (episodesContainer.style.display === 'none') {
-        // Show episodes
+        // Show overview and episodes
+        overviewContainer.style.display = 'block';
         episodesContainer.style.display = 'block';
         toggleIcon.classList.remove('fa-chevron-down');
         toggleIcon.classList.add('fa-chevron-up');
@@ -1677,7 +1679,8 @@ async function toggleSeasonEpisodes(tvId, seasonNumber, seasonName) {
             await loadSeasonEpisodes(tvId, parseInt(seasonNumber), seasonName);
         }
     } else {
-        // Hide episodes
+        // Hide overview and episodes
+        overviewContainer.style.display = 'none';
         episodesContainer.style.display = 'none';
         toggleIcon.classList.remove('fa-chevron-up');
         toggleIcon.classList.add('fa-chevron-down');
