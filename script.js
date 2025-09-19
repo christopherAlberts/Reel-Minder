@@ -37,6 +37,8 @@ function initializeAds() {
 }
 
 // Data Management
+let movieDataStore = {}; // Global store for movie data
+
 function loadData() {
     const savedData = localStorage.getItem('reelMinderData');
     if (savedData) {
@@ -1937,6 +1939,9 @@ function displayDiscoveryResults(items, title) {
         return;
     }
     
+    // Clear previous movie data store
+    movieDataStore = {};
+    
     let html = `
         <div class="discovery-results-header">
             <h3>${title}</h3>
@@ -1953,6 +1958,19 @@ function displayDiscoveryResults(items, title) {
         const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/300x450?text=No+Image';
         const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
         const mediaTypeLabel = mediaType === 'movie' ? 'Movie' : 'TV Series';
+        
+        // Store movie data for later use
+        const movieKey = `${item.id}_${mediaType}`;
+        movieDataStore[movieKey] = {
+            id: item.id,
+            title: itemTitle,
+            year: year,
+            rating: rating,
+            poster: posterPath,
+            overview: item.overview || 'No overview available.',
+            media_type: mediaType,
+            added_date: new Date().toISOString()
+        };
         
         html += `
             <div class="discovery-item" onclick="showMovieDetails(${item.id}, '${mediaType}')">
@@ -1990,40 +2008,12 @@ function displayDiscoveryResults(items, title) {
             const mediaType = btn.dataset.mediaType;
             const movieTitle = btn.dataset.movieTitle;
             
-            // Get the parent discovery item to extract data
-            const discoveryItem = btn.closest('.discovery-item');
-            const posterImg = discoveryItem.querySelector('.discovery-poster img');
-            const titleElement = discoveryItem.querySelector('.discovery-info h4');
-            const metaElement = discoveryItem.querySelector('.discovery-meta');
+            // Get movie data from store
+            const movieKey = `${movieId}_${mediaType}`;
+            const movieData = movieDataStore[movieKey];
             
-            console.log('Discovery item found:', discoveryItem);
-            console.log('Poster img:', posterImg);
-            console.log('Poster src:', posterImg ? posterImg.src : 'No poster');
-            console.log('Title element:', titleElement);
-            console.log('Meta element:', metaElement);
-            
-            let movieData = null;
-            if (titleElement && metaElement) {
-                const title = titleElement.textContent;
-                const metaText = metaElement.textContent;
-                const year = metaText.split(' • ')[0];
-                const rating = metaText.split(' • ')[1];
-                
-                movieData = {
-                    id: parseInt(movieId),
-                    title: title,
-                    year: year,
-                    rating: rating,
-                    poster: posterImg ? posterImg.src : 'https://via.placeholder.com/300x450?text=No+Image',
-                    overview: 'No overview available.',
-                    media_type: mediaType,
-                    added_date: new Date().toISOString()
-                };
-                
-                console.log('Extracted movie data:', movieData);
-            } else {
-                console.log('Could not extract data - missing elements');
-            }
+            console.log('Movie key:', movieKey);
+            console.log('Stored movie data:', movieData);
             
             showLibrarySelectionModal(movieId, mediaType, movieTitle, movieData);
         });
