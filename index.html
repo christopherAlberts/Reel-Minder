@@ -28,6 +28,10 @@
                         <i class="fas fa-folder"></i>
                         Libraries
                     </button>
+                    <button class="nav-btn" data-view="find-something">
+                        <i class="fas fa-random"></i>
+                        Find Something to Watch
+                    </button>
                     <button class="nav-btn" data-view="search">
                         <i class="fas fa-search"></i>
                         Search
@@ -109,6 +113,65 @@
                 </div>
                 <div class="search-results" id="search-results">
                     <!-- Search results will be displayed here -->
+                </div>
+            </div>
+
+            <!-- Find Something to Watch View -->
+            <div id="find-something-view" class="view">
+                <div class="find-something-container">
+                    <div class="find-something-header">
+                        <h2>Find Something to Watch</h2>
+                        <p>Discover new movies and TV series based on your preferences</p>
+                    </div>
+                    <div class="discovery-options">
+                        <div class="discovery-card">
+                            <div class="discovery-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <h3>Trending Now</h3>
+                            <p>See what's popular right now</p>
+                            <button class="btn btn-primary" id="trending-btn">
+                                <i class="fas fa-chart-line"></i>
+                                View Trending
+                            </button>
+                        </div>
+                        <div class="discovery-card">
+                            <div class="discovery-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h3>Top Rated</h3>
+                            <p>Highest rated movies and shows</p>
+                            <button class="btn btn-primary" id="top-rated-btn">
+                                <i class="fas fa-trophy"></i>
+                                View Top Rated
+                            </button>
+                        </div>
+                        <div class="discovery-card">
+                            <div class="discovery-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <h3>Coming Soon</h3>
+                            <p>Upcoming releases</p>
+                            <button class="btn btn-primary" id="upcoming-btn">
+                                <i class="fas fa-clock"></i>
+                                View Upcoming
+                            </button>
+                        </div>
+                        <div class="discovery-card">
+                            <div class="discovery-icon">
+                                <i class="fas fa-random"></i>
+                            </div>
+                            <h3>Random Pick</h3>
+                            <p>Get a random recommendation</p>
+                            <button class="btn btn-primary" id="random-btn">
+                                <i class="fas fa-dice"></i>
+                                Surprise Me
+                            </button>
+                        </div>
+                    </div>
+                    <div class="discovery-results" id="discovery-results">
+                        <!-- Discovery results will be displayed here -->
+                    </div>
                 </div>
             </div>
 

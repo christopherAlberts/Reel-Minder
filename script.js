@@ -169,6 +169,12 @@ function setupEventListeners() {
     document.getElementById('get-recommendations-btn').addEventListener('click', getRecommendations);
     document.getElementById('edit-library-btn').addEventListener('click', editCurrentLibrary);
     document.getElementById('delete-library-btn').addEventListener('click', deleteCurrentLibrary);
+
+    // Discovery buttons
+    document.getElementById('trending-btn').addEventListener('click', () => loadTrendingContent());
+    document.getElementById('top-rated-btn').addEventListener('click', () => loadTopRatedContent());
+    document.getElementById('upcoming-btn').addEventListener('click', () => loadUpcomingContent());
+    document.getElementById('random-btn').addEventListener('click', () => loadRandomContent());
     document.getElementById('share-library-btn').addEventListener('click', shareCurrentLibrary);
     
     // Movie Sorting in Library
@@ -1714,6 +1720,152 @@ function redirectToExternalEpisodeInfo(episodeName, seasonNumber, episodeNumber)
 
 function closeEpisodesModal() {
     document.getElementById('episodes-modal').classList.remove('active');
+}
+
+// Discovery Functions
+async function loadTrendingContent() {
+    const resultsContainer = document.getElementById('discovery-results');
+    resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+        let url;
+        if (hasServerlessFunctions) {
+            url = '/api/trending';
+        } else {
+            url = `${API_BASE}/trending/all/week?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        displayDiscoveryResults(data.results, 'Trending Now');
+        
+    } catch (error) {
+        console.error('Error loading trending content:', error);
+        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load trending content.</p></div>';
+    }
+}
+
+async function loadTopRatedContent() {
+    const resultsContainer = document.getElementById('discovery-results');
+    resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+        let url;
+        if (hasServerlessFunctions) {
+            url = '/api/top-rated';
+        } else {
+            url = `${API_BASE}/movie/top_rated?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        displayDiscoveryResults(data.results, 'Top Rated Movies');
+        
+    } catch (error) {
+        console.error('Error loading top rated content:', error);
+        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load top rated content.</p></div>';
+    }
+}
+
+async function loadUpcomingContent() {
+    const resultsContainer = document.getElementById('discovery-results');
+    resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+        let url;
+        if (hasServerlessFunctions) {
+            url = '/api/upcoming';
+        } else {
+            url = `${API_BASE}/movie/upcoming?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        displayDiscoveryResults(data.results, 'Upcoming Movies');
+        
+    } catch (error) {
+        console.error('Error loading upcoming content:', error);
+        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load upcoming content.</p></div>';
+    }
+}
+
+async function loadRandomContent() {
+    const resultsContainer = document.getElementById('discovery-results');
+    resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+        // Get a random page number between 1 and 500
+        const randomPage = Math.floor(Math.random() * 500) + 1;
+        
+        let url;
+        if (hasServerlessFunctions) {
+            url = `/api/discover?page=${randomPage}`;
+        } else {
+            url = `${API_BASE}/discover/movie?api_key=${API_KEY}&page=${randomPage}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        // Get a random selection of 20 items
+        const shuffled = data.results.sort(() => 0.5 - Math.random());
+        const randomSelection = shuffled.slice(0, 20);
+        
+        displayDiscoveryResults(randomSelection, 'Random Selection');
+        
+    } catch (error) {
+        console.error('Error loading random content:', error);
+        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load random content.</p></div>';
+    }
+}
+
+function displayDiscoveryResults(items, title) {
+    const resultsContainer = document.getElementById('discovery-results');
+    
+    if (!items || items.length === 0) {
+        resultsContainer.innerHTML = '<div class="empty-state"><h3>No Results</h3><p>No content found for this category.</p></div>';
+        return;
+    }
+    
+    let html = `
+        <div class="discovery-results-header">
+            <h3>${title}</h3>
+            <p>${items.length} results found</p>
+        </div>
+        <div class="discovery-grid">
+    `;
+    
+    for (const item of items) {
+        const title = item.title || item.name;
+        const releaseDate = item.release_date || item.first_air_date;
+        const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
+        const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+        const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/300x450?text=No+Image';
+        
+        html += `
+            <div class="discovery-item" onclick="showMovieDetails(${item.id}, '${item.media_type || (item.title ? 'movie' : 'tv')}')">
+                <div class="discovery-poster">
+                    <img src="${posterPath}" alt="${title}" loading="lazy">
+                </div>
+                <div class="discovery-info">
+                    <h4>${title}</h4>
+                    <div class="discovery-meta">
+                        <span class="discovery-year">${year}</span>
+                        <span class="discovery-rating">
+                            <i class="fas fa-star"></i>
+                            ${rating}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    resultsContainer.innerHTML = html;
 }
 
 function closeMovieModal() {
