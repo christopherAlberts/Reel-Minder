@@ -1372,14 +1372,10 @@ async function showMovieDetails(movieId, mediaType) {
                     </div>
                     
                     <div class="movie-detail-actions">
-                        <div class="action-group primary-actions">
-                            ${trailerButtonHtml}
-                            ${episodesButtonHtml}
-                        </div>
-                        <div class="action-group secondary-actions">
-                            ${watchedToggleHtml}
-                            ${shareButtonHtml}
-                        </div>
+                        ${trailerButtonHtml}
+                        ${episodesButtonHtml}
+                        ${watchedToggleHtml}
+                        ${shareButtonHtml}
                     </div>
                 </div>
             </div>
@@ -1495,41 +1491,30 @@ async function showEpisodes(tvId) {
         let episodesHtml = '';
         
         if (tvData.seasons && tvData.seasons.length > 0) {
-            episodesHtml = '<div class="seasons-container">';
-            
+            // Create season dropdown
+            let seasonOptions = '';
             for (const season of tvData.seasons) {
-                // Remove filtering - show all seasons including special seasons
                 const seasonNumber = season.season_number === 0 ? 'Specials' : `Season ${season.season_number}`;
-                
-                episodesHtml += `
-                    <div class="season-section">
-                        <div class="season-header">
-                            <h3>${seasonNumber}</h3>
-                            <span class="season-info">
-                                ${season.episode_count || 0} episodes
-                                ${season.air_date ? ` • ${new Date(season.air_date).getFullYear()}` : ''}
-                            </span>
-                        </div>
-                        <div class="season-overview">
-                            ${season.overview || 'No overview available.'}
-                        </div>
-                        <div class="episodes-list" id="episodes-list-${season.season_number}">
-                            <div class="loading-episodes">
-                                <div class="spinner-small"></div>
-                                <span>Loading episodes...</span>
-                            </div>
-                        </div>
+                seasonOptions += `<option value="${season.season_number}">${seasonNumber} (${season.episode_count || 0} episodes)</option>`;
+            }
+            
+            episodesHtml = `
+                <div class="season-selector">
+                    <label for="season-dropdown">Select Season:</label>
+                    <select id="season-dropdown" onchange="loadSelectedSeason(${tvId}, this.value)">
+                        <option value="">Choose a season...</option>
+                        ${seasonOptions}
+                    </select>
+                </div>
+                <div class="selected-season-content" id="selected-season-content">
+                    <div class="season-placeholder">
+                        <i class="fas fa-tv"></i>
+                        <p>Select a season to view episodes</p>
                     </div>
-                `;
-            }
+                </div>
+            `;
             
-            episodesHtml += '</div>';
             container.innerHTML = episodesHtml;
-            
-            // Load detailed episodes for each season
-            for (const season of tvData.seasons) {
-                await loadSeasonEpisodes(tvId, season.season_number);
-            }
             
         } else {
             episodesHtml = '<div class="empty-state"><h3>No Episode Information</h3><p>Episode details are not available for this series.</p></div>';
@@ -1542,7 +1527,7 @@ async function showEpisodes(tvId) {
     }
 }
 
-async function loadSeasonEpisodes(tvId, seasonNumber) {
+async function loadSeasonEpisodes(tvId, seasonNumber, seasonName = null) {
     try {
         let url;
         if (hasServerlessFunctions) {
@@ -1554,14 +1539,26 @@ async function loadSeasonEpisodes(tvId, seasonNumber) {
         const response = await fetch(url);
         const seasonData = await response.json();
         
-        const episodesContainer = document.getElementById(`episodes-list-${seasonNumber}`);
+        const contentContainer = document.getElementById('selected-season-content');
         
         if (!seasonData.episodes || seasonData.episodes.length === 0) {
-            episodesContainer.innerHTML = '<div class="no-episodes">No episodes available for this season.</div>';
+            contentContainer.innerHTML = '<div class="no-episodes">No episodes available for this season.</div>';
             return;
         }
         
-        let episodesHtml = '';
+        let episodesHtml = `
+            <div class="season-section">
+                <div class="season-header">
+                    <h3>${seasonName || `Season ${seasonNumber}`}</h3>
+                    <span class="season-info">
+                        ${seasonData.episodes.length} episodes
+                    </span>
+                </div>
+                <div class="season-overview">
+                    ${seasonData.overview || 'No overview available.'}
+                </div>
+                <div class="episodes-list">
+        `;
         
         for (const episode of seasonData.episodes) {
             const airDate = episode.air_date ? new Date(episode.air_date).toLocaleDateString() : 'TBA';
@@ -1592,18 +1589,23 @@ async function loadSeasonEpisodes(tvId, seasonNumber) {
                     </div>
                     <div class="episode-external-link">
                         <i class="fas fa-external-link-alt"></i>
-                        Click to view on external sites
+                        Click to view on IMDB
                     </div>
                 </div>
             `;
         }
         
-        episodesContainer.innerHTML = episodesHtml;
+        episodesHtml += `
+                </div>
+            </div>
+        `;
+        
+        contentContainer.innerHTML = episodesHtml;
         
     } catch (error) {
         console.error(`Error loading episodes for season ${seasonNumber}:`, error);
-        const episodesContainer = document.getElementById(`episodes-list-${seasonNumber}`);
-        episodesContainer.innerHTML = '<div class="error-episodes">Failed to load episodes for this season.</div>';
+        const contentContainer = document.getElementById('selected-season-content');
+        contentContainer.innerHTML = '<div class="error-episodes">Failed to load episodes for this season.</div>';
     }
 }
 
@@ -1668,49 +1670,34 @@ async function showEpisodeDetails(tvId, seasonNumber, episodeNumber) {
     }
 }
 
+async function loadSelectedSeason(tvId, seasonNumber) {
+    if (!seasonNumber) return;
+    
+    const contentContainer = document.getElementById('selected-season-content');
+    contentContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+        // Get season info from the dropdown
+        const seasonDropdown = document.getElementById('season-dropdown');
+        const selectedOption = seasonDropdown.options[seasonDropdown.selectedIndex];
+        const seasonName = selectedOption.text.split(' (')[0]; // Remove episode count
+        
+        // Load episodes for the selected season
+        await loadSeasonEpisodes(tvId, parseInt(seasonNumber), seasonName);
+        
+    } catch (error) {
+        console.error('Error loading selected season:', error);
+        contentContainer.innerHTML = '<div class="error-episodes">Failed to load season episodes.</div>';
+    }
+}
+
 function redirectToExternalEpisodeInfo(episodeName, seasonNumber, episodeNumber) {
     // Create search query for the episode
     const searchQuery = encodeURIComponent(`${episodeName} season ${seasonNumber} episode ${episodeNumber}`);
     
-    // Create URLs for different external sites
+    // Direct redirect to IMDB
     const imdbUrl = `https://www.imdb.com/find?q=${searchQuery}`;
-    const wikipediaUrl = `https://en.wikipedia.org/wiki/Special:Search?search=${searchQuery}`;
-    
-    // Show a modal with options to choose which site to visit
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 400px;">
-            <div class="modal-header">
-                <h3>Choose External Site</h3>
-                <button class="close-btn" onclick="this.closest('.modal').remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Where would you like to view information about this episode?</p>
-                <div class="external-links">
-                    <button class="btn btn-primary" onclick="window.open('${imdbUrl}', '_blank'); this.closest('.modal').remove();">
-                        <i class="fas fa-film"></i>
-                        View on IMDB
-                    </button>
-                    <button class="btn btn-secondary" onclick="window.open('${wikipediaUrl}', '_blank'); this.closest('.modal').remove();">
-                        <i class="fas fa-book"></i>
-                        View on Wikipedia
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
+    window.open(imdbUrl, '_blank');
 }
 
 function closeEpisodesModal() {
