@@ -2813,6 +2813,13 @@ body.dark-mode .ad-bottom {
     .nav-btn i {
         font-size: 1rem;
     }
+    
+    /* Settings button - icon only */
+    #settings-nav-btn {
+        flex: 0 0 auto;
+        width: 60px;
+        min-width: 60px;
+    }
 
     .main-content {
         padding: 0.25rem 1rem 3rem 1rem;
