@@ -2712,28 +2712,32 @@ body.dark-mode .ad-bottom {
     }
 
     .nav {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
         padding: 1rem;
     }
 
     .nav-btn {
-        padding: 1rem;
-        font-size: 1rem;
-        min-height: 80px;
+        padding: 1rem 0.5rem;
+        font-size: 0.8rem;
+        min-height: 70px;
         text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
         border-radius: 12px;
         font-weight: 600;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .nav-btn i {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
 
     .main-content {
