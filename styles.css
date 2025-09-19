@@ -2720,9 +2720,9 @@ body.dark-mode .ad-bottom {
     }
 
     .nav-btn {
-        padding: 0.4rem 0.3rem;
-        font-size: 0.6rem;
-        min-height: 36px;
+        padding: 0.6rem 0.4rem;
+        font-size: 0.75rem;
+        min-height: 48px;
         text-align: center;
         white-space: nowrap;
         overflow: hidden;
@@ -2730,14 +2730,14 @@ body.dark-mode .ad-bottom {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.1rem;
-        line-height: 1;
+        gap: 0.2rem;
+        line-height: 1.1;
         flex: 1;
         min-width: 0;
     }
 
     .nav-btn i {
-        font-size: 0.8rem;
+        font-size: 1rem;
         margin: 0;
     }
 
