@@ -2000,6 +2000,14 @@ function displayDiscoveryResults(items, title) {
     html += '</div>';
     resultsContainer.innerHTML = html;
     
+    // Scroll to the results section
+    setTimeout(() => {
+        resultsContainer.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }, 100); // Small delay to ensure content is rendered
+    
     // Add event listeners for add buttons
     resultsContainer.querySelectorAll('.discovery-add-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
