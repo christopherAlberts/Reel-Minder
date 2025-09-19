@@ -1989,7 +1989,33 @@ function displayDiscoveryResults(items, title) {
             const movieId = btn.dataset.movieId;
             const mediaType = btn.dataset.mediaType;
             const movieTitle = btn.dataset.movieTitle;
-            showLibrarySelectionModal(movieId, mediaType, movieTitle);
+            
+            // Get the parent discovery item to extract data
+            const discoveryItem = btn.closest('.discovery-item');
+            const posterImg = discoveryItem.querySelector('.discovery-poster img');
+            const titleElement = discoveryItem.querySelector('.discovery-info h4');
+            const metaElement = discoveryItem.querySelector('.discovery-meta');
+            
+            let movieData = null;
+            if (titleElement && metaElement) {
+                const title = titleElement.textContent;
+                const metaText = metaElement.textContent;
+                const year = metaText.split(' • ')[0];
+                const rating = metaText.split(' • ')[1];
+                
+                movieData = {
+                    id: parseInt(movieId),
+                    title: title,
+                    year: year,
+                    rating: rating,
+                    poster: posterImg ? posterImg.src : 'https://via.placeholder.com/300x450?text=No+Image',
+                    overview: 'No overview available.',
+                    media_type: mediaType,
+                    added_date: new Date().toISOString()
+                };
+            }
+            
+            showLibrarySelectionModal(movieId, mediaType, movieTitle, movieData);
         });
     });
 }
@@ -1998,11 +2024,14 @@ function closeMovieModal() {
     document.getElementById('movie-modal').classList.remove('active');
 }
 
-function showLibrarySelectionModal(movieId, mediaType, movieTitle) {
+function showLibrarySelectionModal(movieId, mediaType, movieTitle, movieData) {
     if (libraries.length === 0) {
         alert('You need to create a library first!');
         return;
     }
+    
+    // Store the movie data globally for the addToSelectedLibrary function
+    window.currentMovieData = movieData;
     
     // Create modal HTML
     const modalHtml = `
@@ -2043,6 +2072,8 @@ function closeLibrarySelectionModal() {
     if (modal) {
         modal.remove();
     }
+    // Clean up the stored movie data
+    window.currentMovieData = null;
 }
 
 async function addToSelectedLibrary(libraryId, movieId, mediaType) {
@@ -2061,40 +2092,10 @@ async function addToSelectedLibrary(libraryId, movieId, mediaType) {
     }
     
     try {
-        // First, try to get data from the current discovery results
-        const discoveryResults = document.querySelectorAll('.discovery-item');
-        let movieData = null;
+        // Use the stored movie data from the modal
+        let movieData = window.currentMovieData;
         
-        for (const item of discoveryResults) {
-            const addBtn = item.querySelector('.discovery-add-btn');
-            if (addBtn && addBtn.dataset.movieId == movieId && addBtn.dataset.mediaType === mediaType) {
-                // Extract data from the discovery item
-                const posterImg = item.querySelector('.discovery-poster img');
-                const titleElement = item.querySelector('.discovery-info h4');
-                const metaElement = item.querySelector('.discovery-meta');
-                
-                if (titleElement && metaElement) {
-                    const title = titleElement.textContent;
-                    const metaText = metaElement.textContent;
-                    const year = metaText.split(' • ')[0];
-                    const rating = metaText.split(' • ')[1];
-                    
-                    movieData = {
-                        id: parseInt(movieId),
-                        title: title,
-                        year: year,
-                        rating: rating,
-                        poster: posterImg ? posterImg.src : 'https://via.placeholder.com/300x450?text=No+Image',
-                        overview: 'No overview available.',
-                        media_type: mediaType,
-                        added_date: new Date().toISOString()
-                    };
-                    break;
-                }
-            }
-        }
-        
-        // If we couldn't get data from discovery results, fetch from API
+        // If we don't have stored data, fetch from API
         if (!movieData) {
             let url;
             if (hasServerlessFunctions) {
