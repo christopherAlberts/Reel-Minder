@@ -359,7 +359,7 @@ body.dark-mode .sort-select option {
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .library-controls-bottom {
@@ -2871,6 +2871,7 @@ body.dark-mode .ad-bottom {
     .library-controls-top {
         justify-content: center;
         gap: 0.75rem;
+        flex-wrap: nowrap;
     }
 
     .library-controls-bottom {
