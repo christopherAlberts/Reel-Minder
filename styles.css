@@ -157,9 +157,10 @@ body.dark-mode .sort-select option {
     font-size: 0.9rem;
     font-style: italic;
     color: #6c757d;
-    margin: 0.2rem 0 0 0;
-    text-align: left;
+    margin: 0.2rem auto 0 auto;
+    text-align: center;
     font-family: 'Georgia', serif;
+    padding: 0 1rem;
 }
 
 .nav {
@@ -2784,6 +2785,11 @@ body.dark-mode .ad-bottom {
         text-align: center;
         gap: 0.2rem;
         align-items: center;
+    }
+    
+    .tagline {
+        text-align: center;
+        padding: 0 0.5rem;
     }
     
     .logo {
