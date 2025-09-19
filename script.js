@@ -1372,14 +1372,10 @@ async function showMovieDetails(movieId, mediaType) {
                     </div>
                     
                     <div class="movie-detail-actions">
-                        <div class="button-row">
-                            ${trailerButtonHtml}
-                            ${shareButtonHtml}
-                        </div>
-                        <div class="button-row">
-                            ${episodesButtonHtml}
-                            ${watchedToggleHtml}
-                        </div>
+                        ${trailerButtonHtml}
+                        ${episodesButtonHtml}
+                        ${watchedToggleHtml}
+                        ${shareButtonHtml}
                     </div>
                 </div>
             </div>
@@ -1495,38 +1491,38 @@ async function showEpisodes(tvId) {
         let episodesHtml = '';
         
         if (tvData.seasons && tvData.seasons.length > 0) {
-            // Create season cards
-            let seasonCards = '';
+            // Create season list with expandable episodes
+            let seasonList = '';
             for (const season of tvData.seasons) {
                 const seasonNumber = season.season_number === 0 ? 'Specials' : `Season ${season.season_number}`;
                 const airYear = season.air_date ? new Date(season.air_date).getFullYear() : '';
                 
-                seasonCards += `
-                    <div class="season-card" onclick="loadSelectedSeason(${tvId}, ${season.season_number}, '${seasonNumber}')">
-                        <div class="season-card-header">
-                            <h4>${seasonNumber}</h4>
-                            <span class="season-episode-count">${season.episode_count || 0} episodes</span>
+                seasonList += `
+                    <div class="season-item">
+                        <div class="season-header" onclick="toggleSeasonEpisodes(${tvId}, ${season.season_number}, '${seasonNumber}')">
+                            <div class="season-title">
+                                <h4>${seasonNumber}</h4>
+                                <span class="season-episode-count">${season.episode_count || 0} episodes</span>
+                                ${airYear ? `<span class="season-year">${airYear}</span>` : ''}
+                            </div>
+                            <div class="season-toggle">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
                         </div>
-                        <div class="season-card-info">
-                            ${airYear ? `<span class="season-year">${airYear}</span>` : ''}
-                            ${season.overview ? `<p class="season-card-overview">${season.overview.length > 100 ? season.overview.substring(0, 100) + '...' : season.overview}</p>` : ''}
+                        <div class="season-overview">
+                            ${season.overview || 'No overview available.'}
+                        </div>
+                        <div class="season-episodes" id="episodes-${season.season_number}" style="display: none;">
+                            <div class="loading-episodes">
+                                <div class="spinner-small"></div>
+                                <span>Loading episodes...</span>
+                            </div>
                         </div>
                     </div>
                 `;
             }
             
-            episodesHtml = `
-                <div class="seasons-grid">
-                    ${seasonCards}
-                </div>
-                <div class="selected-season-content" id="selected-season-content">
-                    <div class="season-placeholder">
-                        <i class="fas fa-tv"></i>
-                        <p>Click on a season to view episodes</p>
-                    </div>
-                </div>
-            `;
-            
+            episodesHtml = `<div class="seasons-list">${seasonList}</div>`;
             container.innerHTML = episodesHtml;
             
         } else {
@@ -1552,26 +1548,14 @@ async function loadSeasonEpisodes(tvId, seasonNumber, seasonName = null) {
         const response = await fetch(url);
         const seasonData = await response.json();
         
-        const contentContainer = document.getElementById('selected-season-content');
+        const episodesContainer = document.getElementById(`episodes-${seasonNumber}`);
         
         if (!seasonData.episodes || seasonData.episodes.length === 0) {
-            contentContainer.innerHTML = '<div class="no-episodes">No episodes available for this season.</div>';
+            episodesContainer.innerHTML = '<div class="no-episodes">No episodes available for this season.</div>';
             return;
         }
         
-        let episodesHtml = `
-            <div class="season-section">
-                <div class="season-header">
-                    <h3>${seasonName || `Season ${seasonNumber}`}</h3>
-                    <span class="season-info">
-                        ${seasonData.episodes.length} episodes
-                    </span>
-                </div>
-                <div class="season-overview">
-                    ${seasonData.overview || 'No overview available.'}
-                </div>
-                <div class="episodes-list">
-        `;
+        let episodesHtml = '';
         
         for (const episode of seasonData.episodes) {
             const airDate = episode.air_date ? new Date(episode.air_date).toLocaleDateString() : 'TBA';
@@ -1608,17 +1592,12 @@ async function loadSeasonEpisodes(tvId, seasonNumber, seasonName = null) {
             `;
         }
         
-        episodesHtml += `
-                </div>
-            </div>
-        `;
-        
-        contentContainer.innerHTML = episodesHtml;
+        episodesContainer.innerHTML = episodesHtml;
         
     } catch (error) {
         console.error(`Error loading episodes for season ${seasonNumber}:`, error);
-        const contentContainer = document.getElementById('selected-season-content');
-        contentContainer.innerHTML = '<div class="error-episodes">Failed to load episodes for this season.</div>';
+        const episodesContainer = document.getElementById(`episodes-${seasonNumber}`);
+        episodesContainer.innerHTML = '<div class="error-episodes">Failed to load episodes for this season.</div>';
     }
 }
 
@@ -1683,6 +1662,28 @@ async function showEpisodeDetails(tvId, seasonNumber, episodeNumber) {
     }
 }
 
+async function toggleSeasonEpisodes(tvId, seasonNumber, seasonName) {
+    const episodesContainer = document.getElementById(`episodes-${seasonNumber}`);
+    const toggleIcon = episodesContainer.previousElementSibling.previousElementSibling.querySelector('.season-toggle i');
+    
+    if (episodesContainer.style.display === 'none') {
+        // Show episodes
+        episodesContainer.style.display = 'block';
+        toggleIcon.classList.remove('fa-chevron-down');
+        toggleIcon.classList.add('fa-chevron-up');
+        
+        // Load episodes if not already loaded
+        if (episodesContainer.querySelector('.loading-episodes')) {
+            await loadSeasonEpisodes(tvId, parseInt(seasonNumber), seasonName);
+        }
+    } else {
+        // Hide episodes
+        episodesContainer.style.display = 'none';
+        toggleIcon.classList.remove('fa-chevron-up');
+        toggleIcon.classList.add('fa-chevron-down');
+    }
+}
+
 async function loadSelectedSeason(tvId, seasonNumber, seasonName) {
     if (!seasonNumber) return;
     
@@ -1700,11 +1701,11 @@ async function loadSelectedSeason(tvId, seasonNumber, seasonName) {
 }
 
 function redirectToExternalEpisodeInfo(episodeName, seasonNumber, episodeNumber) {
-    // Create search query for the episode
-    const searchQuery = encodeURIComponent(`${episodeName} season ${seasonNumber} episode ${episodeNumber}`);
+    // Create a more specific search query for IMDB
+    const searchQuery = encodeURIComponent(`${episodeName} S${seasonNumber.toString().padStart(2, '0')}E${episodeNumber.toString().padStart(2, '0')}`);
     
-    // Direct redirect to IMDB
-    const imdbUrl = `https://www.imdb.com/find?q=${searchQuery}`;
+    // Try to find the episode directly on IMDB
+    const imdbUrl = `https://www.imdb.com/find?q=${searchQuery}&s=ep&ref_=fn_ep`;
     window.open(imdbUrl, '_blank');
 }
 
