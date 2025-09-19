@@ -1439,15 +1439,17 @@ body.dark-mode .watched-status:has(.fa-clock) {
     flex: 1;
     min-width: 0;
     text-align: center;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0.5rem;
     border: none;
     height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    white-space: nowrap;
+    white-space: normal;
     min-height: 48px;
+    font-size: 0.9rem;
+    line-height: 1.2;
 }
 
 .share-btn {
@@ -1552,20 +1554,98 @@ body.dark-mode .watched-status:has(.fa-clock) {
     transform: translateY(-1px);
 }
 
-.episode-info {
+.clickable-episode {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clickable-episode:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    border-color: #667eea;
+}
+
+.episode-header {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.episode-title {
+    display: flex;
     align-items: center;
+    gap: 0.5rem;
+    flex: 1;
 }
 
 .episode-number {
     font-weight: 600;
-    color: #333;
+    color: #667eea;
+    font-size: 0.9rem;
+    min-width: 2rem;
 }
 
-.episode-date {
-    color: #666;
+.episode-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+}
+
+.episode-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #f39c12;
+    font-weight: 600;
     font-size: 0.9rem;
+}
+
+.episode-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.episode-date,
+.episode-runtime {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.episode-overview {
+    color: #555;
+    line-height: 1.4;
+    font-size: 0.9rem;
+}
+
+.loading-episodes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    color: #666;
+}
+
+.spinner-small {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.no-episodes,
+.error-episodes {
+    text-align: center;
+    padding: 1rem;
+    color: #666;
+    font-style: italic;
 }
 
 /* Dark mode styles for episodes */
@@ -1603,6 +1683,36 @@ body.dark-mode .episode-date {
     color: #a0aec0;
 }
 
+body.dark-mode .clickable-episode:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border-color: #667eea;
+}
+
+body.dark-mode .episode-name {
+    color: #e2e8f0;
+}
+
+body.dark-mode .episode-rating {
+    color: #f39c12;
+}
+
+body.dark-mode .episode-meta {
+    color: #a0aec0;
+}
+
+body.dark-mode .episode-overview {
+    color: #cbd5e0;
+}
+
+body.dark-mode .loading-episodes {
+    color: #a0aec0;
+}
+
+body.dark-mode .no-episodes,
+body.dark-mode .error-episodes {
+    color: #a0aec0;
+}
+
 /* Mobile responsive styles for episodes */
 @media (max-width: 768px) {
     .episodes-modal-content {
@@ -1624,10 +1734,23 @@ body.dark-mode .episode-date {
         font-size: 1.1rem;
     }
     
-    .episode-info {
+    .episode-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .episode-title {
+        width: 100%;
+    }
+    
+    .episode-meta {
+        flex-direction: column;
         gap: 0.3rem;
+    }
+    
+    .episode-overview {
+        font-size: 0.85rem;
     }
 }
 

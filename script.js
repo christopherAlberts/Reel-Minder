@@ -1494,12 +1494,13 @@ async function showEpisodes(tvId) {
             episodesHtml = '<div class="seasons-container">';
             
             for (const season of tvData.seasons) {
-                if (season.season_number === 0) continue; // Skip special seasons
+                // Remove filtering - show all seasons including special seasons
+                const seasonNumber = season.season_number === 0 ? 'Specials' : `Season ${season.season_number}`;
                 
                 episodesHtml += `
                     <div class="season-section">
                         <div class="season-header">
-                            <h3>Season ${season.season_number}</h3>
+                            <h3>${seasonNumber}</h3>
                             <span class="season-info">
                                 ${season.episode_count || 0} episodes
                                 ${season.air_date ? ` • ${new Date(season.air_date).getFullYear()}` : ''}
@@ -1508,12 +1509,10 @@ async function showEpisodes(tvId) {
                         <div class="season-overview">
                             ${season.overview || 'No overview available.'}
                         </div>
-                        <div class="episodes-list">
-                            <div class="episode-item">
-                                <div class="episode-info">
-                                    <span class="episode-number">Episodes: ${season.episode_count || 'Unknown'}</span>
-                                    <span class="episode-date">${season.air_date ? new Date(season.air_date).toLocaleDateString() : 'TBA'}</span>
-                                </div>
+                        <div class="episodes-list" id="episodes-list-${season.season_number}">
+                            <div class="loading-episodes">
+                                <div class="spinner-small"></div>
+                                <span>Loading episodes...</span>
                             </div>
                         </div>
                     </div>
@@ -1521,15 +1520,143 @@ async function showEpisodes(tvId) {
             }
             
             episodesHtml += '</div>';
+            container.innerHTML = episodesHtml;
+            
+            // Load detailed episodes for each season
+            for (const season of tvData.seasons) {
+                await loadSeasonEpisodes(tvId, season.season_number);
+            }
+            
         } else {
             episodesHtml = '<div class="empty-state"><h3>No Episode Information</h3><p>Episode details are not available for this series.</p></div>';
+            container.innerHTML = episodesHtml;
         }
-        
-        container.innerHTML = episodesHtml;
         
     } catch (error) {
         console.error('Error fetching episodes:', error);
         container.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load episode information. Please try again.</p></div>';
+    }
+}
+
+async function loadSeasonEpisodes(tvId, seasonNumber) {
+    try {
+        let url;
+        if (hasServerlessFunctions) {
+            url = `/api/season-episodes?id=${tvId}&season=${seasonNumber}`;
+        } else {
+            url = `${API_BASE}/tv/${tvId}/season/${seasonNumber}?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
+        const seasonData = await response.json();
+        
+        const episodesContainer = document.getElementById(`episodes-list-${seasonNumber}`);
+        
+        if (!seasonData.episodes || seasonData.episodes.length === 0) {
+            episodesContainer.innerHTML = '<div class="no-episodes">No episodes available for this season.</div>';
+            return;
+        }
+        
+        let episodesHtml = '';
+        
+        for (const episode of seasonData.episodes) {
+            const airDate = episode.air_date ? new Date(episode.air_date).toLocaleDateString() : 'TBA';
+            const rating = episode.vote_average ? episode.vote_average.toFixed(1) : 'N/A';
+            const overview = episode.overview || 'No overview available.';
+            
+            episodesHtml += `
+                <div class="episode-item clickable-episode" onclick="showEpisodeDetails(${tvId}, ${seasonNumber}, ${episode.episode_number})">
+                    <div class="episode-header">
+                        <div class="episode-title">
+                            <span class="episode-number">${episode.episode_number}.</span>
+                            <span class="episode-name">${episode.name || 'Untitled Episode'}</span>
+                        </div>
+                        <div class="episode-rating">
+                            <i class="fas fa-star"></i>
+                            ${rating}
+                        </div>
+                    </div>
+                    <div class="episode-meta">
+                        <span class="episode-date">
+                            <i class="fas fa-calendar"></i>
+                            ${airDate}
+                        </span>
+                        ${episode.runtime ? `<span class="episode-runtime"><i class="fas fa-clock"></i> ${episode.runtime} min</span>` : ''}
+                    </div>
+                    <div class="episode-overview">
+                        ${overview.length > 150 ? overview.substring(0, 150) + '...' : overview}
+                    </div>
+                </div>
+            `;
+        }
+        
+        episodesContainer.innerHTML = episodesHtml;
+        
+    } catch (error) {
+        console.error(`Error loading episodes for season ${seasonNumber}:`, error);
+        const episodesContainer = document.getElementById(`episodes-list-${seasonNumber}`);
+        episodesContainer.innerHTML = '<div class="error-episodes">Failed to load episodes for this season.</div>';
+    }
+}
+
+async function showEpisodeDetails(tvId, seasonNumber, episodeNumber) {
+    const modal = document.getElementById('movie-modal');
+    const container = document.getElementById('movie-detail-content');
+    const title = document.getElementById('movie-modal-title');
+    
+    container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    modal.classList.add('active');
+    
+    try {
+        let url;
+        if (hasServerlessFunctions) {
+            url = `/api/episode-details?id=${tvId}&season=${seasonNumber}&episode=${episodeNumber}`;
+        } else {
+            url = `${API_BASE}/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
+        const episodeData = await response.json();
+        
+        if (!episodeData) {
+            throw new Error('Failed to fetch episode data');
+        }
+        
+        title.textContent = `${episodeData.name || 'Episode Details'}`;
+        
+        const airDate = episodeData.air_date ? new Date(episodeData.air_date).toLocaleDateString() : 'TBA';
+        const rating = episodeData.vote_average ? episodeData.vote_average.toFixed(1) : 'N/A';
+        const runtime = episodeData.runtime ? `${episodeData.runtime} min` : 'N/A';
+        const overview = episodeData.overview || 'No overview available.';
+        
+        container.innerHTML = `
+            <div class="movie-detail">
+                <div class="movie-detail-info">
+                    <h2>${episodeData.name || 'Untitled Episode'}</h2>
+                    
+                    <div class="movie-detail-meta">
+                        <span><i class="fas fa-calendar"></i> ${airDate}</span>
+                        <span><i class="fas fa-clock"></i> ${runtime}</span>
+                        <span><i class="fas fa-star"></i> ${rating} / 10</span>
+                    </div>
+                    
+                    <div class="movie-detail-overview">
+                        <h3>Overview</h3>
+                        <p>${overview}</p>
+                    </div>
+                    
+                    <div class="movie-detail-additional-info">
+                        <p><strong>Season:</strong> ${seasonNumber}</p>
+                        <p><strong>Episode:</strong> ${episodeNumber}</p>
+                        <p><strong>Vote Count:</strong> ${episodeData.vote_count || 0}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Error fetching episode details:', error);
+        container.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load episode details. Please try again.</p></div>';
     }
 }
 
