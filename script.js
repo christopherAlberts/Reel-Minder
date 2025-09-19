@@ -2061,31 +2061,67 @@ async function addToSelectedLibrary(libraryId, movieId, mediaType) {
     }
     
     try {
-        // Fetch movie details
-        let url;
-        if (hasServerlessFunctions) {
-            url = `/api/details?id=${movieId}&type=${mediaType}`;
-        } else {
-            url = `${API_BASE}/${mediaType}/${movieId}?api_key=${API_KEY}`;
+        // First, try to get data from the current discovery results
+        const discoveryResults = document.querySelectorAll('.discovery-item');
+        let movieData = null;
+        
+        for (const item of discoveryResults) {
+            const addBtn = item.querySelector('.discovery-add-btn');
+            if (addBtn && addBtn.dataset.movieId == movieId && addBtn.dataset.mediaType === mediaType) {
+                // Extract data from the discovery item
+                const posterImg = item.querySelector('.discovery-poster img');
+                const titleElement = item.querySelector('.discovery-info h4');
+                const metaElement = item.querySelector('.discovery-meta');
+                
+                if (titleElement && metaElement) {
+                    const title = titleElement.textContent;
+                    const metaText = metaElement.textContent;
+                    const year = metaText.split(' • ')[0];
+                    const rating = metaText.split(' • ')[1];
+                    
+                    movieData = {
+                        id: parseInt(movieId),
+                        title: title,
+                        year: year,
+                        rating: rating,
+                        poster: posterImg ? posterImg.src : 'https://via.placeholder.com/300x450?text=No+Image',
+                        overview: 'No overview available.',
+                        media_type: mediaType,
+                        added_date: new Date().toISOString()
+                    };
+                    break;
+                }
+            }
         }
         
-        const response = await fetch(url);
-        const movieData = await response.json();
+        // If we couldn't get data from discovery results, fetch from API
+        if (!movieData) {
+            let url;
+            if (hasServerlessFunctions) {
+                url = `/api/details?id=${movieId}&type=${mediaType}`;
+            } else {
+                url = `${API_BASE}/${mediaType}/${movieId}?api_key=${API_KEY}`;
+            }
+            
+            const response = await fetch(url);
+            const apiData = await response.json();
+            
+            movieData = {
+                id: apiData.id,
+                title: apiData.title || apiData.name,
+                year: apiData.release_date ? new Date(apiData.release_date).getFullYear() : 
+                      (apiData.first_air_date ? new Date(apiData.first_air_date).getFullYear() : 'N/A'),
+                rating: apiData.vote_average ? apiData.vote_average.toFixed(1) : 'N/A',
+                poster: apiData.poster_path ? `https://image.tmdb.org/t/p/w300${apiData.poster_path}` : 'https://via.placeholder.com/300x450?text=No+Image',
+                overview: apiData.overview || 'No overview available.',
+                media_type: mediaType,
+                added_date: new Date().toISOString()
+            };
+        }
         
-        // Add to library
-        const movieToAdd = {
-            id: movieData.id,
-            title: movieData.title || movieData.name,
-            year: movieData.release_date ? new Date(movieData.release_date).getFullYear() : 
-                  (movieData.first_air_date ? new Date(movieData.first_air_date).getFullYear() : 'N/A'),
-            rating: movieData.vote_average ? movieData.vote_average.toFixed(1) : 'N/A',
-            poster: movieData.poster_path ? `https://image.tmdb.org/t/p/w300${movieData.poster_path}` : 'https://via.placeholder.com/300x450?text=No+Image',
-            overview: movieData.overview || 'No overview available.',
-            media_type: mediaType,
-            added_date: new Date().toISOString()
-        };
+        console.log('Movie data to add:', movieData); // Debug log
         
-        library.movies.push(movieToAdd);
+        library.movies.push(movieData);
         saveData();
         
         // Close modal and show success
