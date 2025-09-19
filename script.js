@@ -234,6 +234,7 @@ function setupEventListeners() {
 
     // Movie Modal
     document.getElementById('close-movie-modal').addEventListener('click', closeMovieModal);
+    document.getElementById('close-episodes-modal').addEventListener('click', closeEpisodesModal);
 
     // Add to Library Modal
     document.getElementById('close-add-to-library-modal').addEventListener('click', closeAddToLibraryModal);
@@ -1321,6 +1322,7 @@ async function showMovieDetails(movieId, mediaType) {
         const shareButtonHtml = `<button class="btn btn-secondary share-btn" onclick="shareMovieFromDetails(${movieId}, '${mediaType}')"><i class="fas fa-share"></i> Share</button>`;
         const trailerButtonHtml = trailer ? `<button class="btn btn-primary watch-trailer-btn" onclick="openTrailer('${trailer.key}')"><i class="fas fa-play"></i> Watch Trailer</button>` : '';
         const watchedToggleHtml = isInLibrary ? `<button class="btn ${libraryMovie.watched ? 'btn-success' : 'btn-watched'}" onclick="toggleWatchedFromDetails(${movieId}, '${mediaType}', ${!libraryMovie.watched})"><i class="fas ${libraryMovie.watched ? 'fa-check-circle' : 'fa-eye'}"></i> Watched</button>` : '';
+        const episodesButtonHtml = mediaType === 'tv' ? `<button class="btn btn-info episodes-btn" onclick="showEpisodes(${movieId})"><i class="fas fa-list"></i> Episodes</button>` : '';
         
         console.log('Creating movie detail HTML with share button:', shareButtonHtml);
         
@@ -1371,6 +1373,7 @@ async function showMovieDetails(movieId, mediaType) {
                     
                     <div class="movie-detail-actions">
                         ${trailerButtonHtml}
+                        ${episodesButtonHtml}
                         ${watchedToggleHtml}
                         ${shareButtonHtml}
                     </div>
@@ -1449,6 +1452,89 @@ async function fetchTVVideos(tvId) {
         console.error('TV videos error:', error);
         return null;
     }
+}
+
+async function fetchTVEpisodes(tvId) {
+    try {
+        let url;
+        if (hasServerlessFunctions) {
+            url = `/api/episodes?id=${tvId}`;
+        } else {
+            url = `${API_BASE}/tv/${tvId}?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
+        return await response.json();
+    } catch (error) {
+        console.error('TV episodes error:', error);
+        return null;
+    }
+}
+
+async function showEpisodes(tvId) {
+    const modal = document.getElementById('episodes-modal');
+    const container = document.getElementById('episodes-content');
+    const title = document.getElementById('episodes-modal-title');
+    
+    container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    modal.classList.add('active');
+    
+    try {
+        const tvData = await fetchTVEpisodes(tvId);
+        
+        if (!tvData) {
+            throw new Error('Failed to fetch TV data');
+        }
+        
+        title.textContent = `${tvData.name} - Episodes`;
+        
+        let episodesHtml = '';
+        
+        if (tvData.seasons && tvData.seasons.length > 0) {
+            episodesHtml = '<div class="seasons-container">';
+            
+            for (const season of tvData.seasons) {
+                if (season.season_number === 0) continue; // Skip special seasons
+                
+                episodesHtml += `
+                    <div class="season-section">
+                        <div class="season-header">
+                            <h3>Season ${season.season_number}</h3>
+                            <span class="season-info">
+                                ${season.episode_count || 0} episodes
+                                ${season.air_date ? ` • ${new Date(season.air_date).getFullYear()}` : ''}
+                            </span>
+                        </div>
+                        <div class="season-overview">
+                            ${season.overview || 'No overview available.'}
+                        </div>
+                        <div class="episodes-list">
+                            <div class="episode-item">
+                                <div class="episode-info">
+                                    <span class="episode-number">Episodes: ${season.episode_count || 'Unknown'}</span>
+                                    <span class="episode-date">${season.air_date ? new Date(season.air_date).toLocaleDateString() : 'TBA'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            episodesHtml += '</div>';
+        } else {
+            episodesHtml = '<div class="empty-state"><h3>No Episode Information</h3><p>Episode details are not available for this series.</p></div>';
+        }
+        
+        container.innerHTML = episodesHtml;
+        
+    } catch (error) {
+        console.error('Error fetching episodes:', error);
+        container.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load episode information. Please try again.</p></div>';
+    }
+}
+
+function closeEpisodesModal() {
+    document.getElementById('episodes-modal').classList.remove('active');
 }
 
 function closeMovieModal() {

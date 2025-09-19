@@ -1274,6 +1274,11 @@ body.dark-mode .watched-status:has(.fa-clock) {
     max-width: 800px;
 }
 
+.episodes-modal-content {
+    max-width: 900px;
+    max-height: 85vh;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -1479,6 +1484,151 @@ body.dark-mode .watched-status:has(.fa-clock) {
 .movie-detail-additional-info strong {
     color: #667eea;
     font-weight: 600;
+}
+
+/* Episodes Modal Styles */
+.episodes-content {
+    padding: 1rem;
+}
+
+.seasons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.season-section {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.season-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #667eea;
+}
+
+.season-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.season-info {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.season-overview {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.episodes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.episode-item {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.episode-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.episode-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.episode-number {
+    font-weight: 600;
+    color: #333;
+}
+
+.episode-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Dark mode styles for episodes */
+body.dark-mode .season-section {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+body.dark-mode .season-header h3 {
+    color: #e2e8f0;
+}
+
+body.dark-mode .season-info {
+    color: #a0aec0;
+}
+
+body.dark-mode .season-overview {
+    color: #cbd5e0;
+}
+
+body.dark-mode .episode-item {
+    background: #1a202c;
+    border-color: #4a5568;
+}
+
+body.dark-mode .episode-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .episode-number {
+    color: #e2e8f0;
+}
+
+body.dark-mode .episode-date {
+    color: #a0aec0;
+}
+
+/* Mobile responsive styles for episodes */
+@media (max-width: 768px) {
+    .episodes-modal-content {
+        max-width: 95%;
+        max-height: 90vh;
+    }
+    
+    .season-section {
+        padding: 1rem;
+    }
+    
+    .season-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .season-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .episode-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
 }
 
 /* Libraries List */
