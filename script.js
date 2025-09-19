@@ -175,6 +175,10 @@ function setupEventListeners() {
     document.getElementById('top-rated-btn').addEventListener('click', () => loadTopRatedContent());
     document.getElementById('upcoming-btn').addEventListener('click', () => loadUpcomingContent());
     document.getElementById('random-btn').addEventListener('click', () => loadRandomContent());
+
+    // Discovery filters
+    document.getElementById('discovery-media-type').addEventListener('change', updateDiscoveryFilters);
+    document.getElementById('discovery-library-select').addEventListener('change', updateDiscoveryFilters);
     document.getElementById('share-library-btn').addEventListener('click', shareCurrentLibrary);
     
     // Movie Sorting in Library
@@ -297,6 +301,9 @@ function switchView(viewName) {
     } else if (viewName === 'search') {
         // Clear search results
         document.getElementById('search-results').innerHTML = '';
+    } else if (viewName === 'find-something') {
+        // Populate library dropdown
+        populateDiscoveryLibraryDropdown();
     }
 }
 
@@ -1723,16 +1730,38 @@ function closeEpisodesModal() {
 }
 
 // Discovery Functions
+function populateDiscoveryLibraryDropdown() {
+    const librarySelect = document.getElementById('discovery-library-select');
+    librarySelect.innerHTML = '<option value="">Select Library...</option>';
+    
+    libraries.forEach(library => {
+        const option = document.createElement('option');
+        option.value = library.id;
+        option.textContent = library.name;
+        librarySelect.appendChild(option);
+    });
+}
+
+function updateDiscoveryFilters() {
+    // This function can be used to update UI based on filter changes
+    // For now, it's a placeholder for future enhancements
+}
+
 async function loadTrendingContent() {
     const resultsContainer = document.getElementById('discovery-results');
+    const mediaType = document.getElementById('discovery-media-type').value;
     resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = '/api/trending';
+            url = `/api/trending?media_type=${mediaType}`;
         } else {
-            url = `${API_BASE}/trending/all/week?api_key=${API_KEY}`;
+            if (mediaType === 'all') {
+                url = `${API_BASE}/trending/all/week?api_key=${API_KEY}`;
+            } else {
+                url = `${API_BASE}/trending/${mediaType}/week?api_key=${API_KEY}`;
+            }
         }
         
         const response = await fetch(url);
@@ -1748,20 +1777,26 @@ async function loadTrendingContent() {
 
 async function loadTopRatedContent() {
     const resultsContainer = document.getElementById('discovery-results');
+    const mediaType = document.getElementById('discovery-media-type').value;
     resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = '/api/top-rated';
+            url = `/api/top-rated?media_type=${mediaType}`;
         } else {
-            url = `${API_BASE}/movie/top_rated?api_key=${API_KEY}`;
+            if (mediaType === 'tv') {
+                url = `${API_BASE}/tv/top_rated?api_key=${API_KEY}`;
+            } else {
+                url = `${API_BASE}/movie/top_rated?api_key=${API_KEY}`;
+            }
         }
         
         const response = await fetch(url);
         const data = await response.json();
         
-        displayDiscoveryResults(data.results, 'Top Rated Movies');
+        const title = mediaType === 'tv' ? 'Top Rated TV Series' : 'Top Rated Movies';
+        displayDiscoveryResults(data.results, title);
         
     } catch (error) {
         console.error('Error loading top rated content:', error);
@@ -1771,20 +1806,26 @@ async function loadTopRatedContent() {
 
 async function loadUpcomingContent() {
     const resultsContainer = document.getElementById('discovery-results');
+    const mediaType = document.getElementById('discovery-media-type').value;
     resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = '/api/upcoming';
+            url = `/api/upcoming?media_type=${mediaType}`;
         } else {
-            url = `${API_BASE}/movie/upcoming?api_key=${API_KEY}`;
+            if (mediaType === 'tv') {
+                url = `${API_BASE}/tv/on_the_air?api_key=${API_KEY}`;
+            } else {
+                url = `${API_BASE}/movie/upcoming?api_key=${API_KEY}`;
+            }
         }
         
         const response = await fetch(url);
         const data = await response.json();
         
-        displayDiscoveryResults(data.results, 'Upcoming Movies');
+        const title = mediaType === 'tv' ? 'Currently Airing TV Series' : 'Upcoming Movies';
+        displayDiscoveryResults(data.results, title);
         
     } catch (error) {
         console.error('Error loading upcoming content:', error);
@@ -1794,6 +1835,7 @@ async function loadUpcomingContent() {
 
 async function loadRandomContent() {
     const resultsContainer = document.getElementById('discovery-results');
+    const mediaType = document.getElementById('discovery-media-type').value;
     resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     
     try {
@@ -1802,9 +1844,13 @@ async function loadRandomContent() {
         
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/discover?page=${randomPage}`;
+            url = `/api/discover?page=${randomPage}&media_type=${mediaType}`;
         } else {
-            url = `${API_BASE}/discover/movie?api_key=${API_KEY}&page=${randomPage}`;
+            if (mediaType === 'tv') {
+                url = `${API_BASE}/discover/tv?api_key=${API_KEY}&page=${randomPage}`;
+            } else {
+                url = `${API_BASE}/discover/movie?api_key=${API_KEY}&page=${randomPage}`;
+            }
         }
         
         const response = await fetch(url);
@@ -1839,19 +1885,27 @@ function displayDiscoveryResults(items, title) {
     `;
     
     for (const item of items) {
-        const title = item.title || item.name;
+        const itemTitle = item.title || item.name;
         const releaseDate = item.release_date || item.first_air_date;
         const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
         const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
         const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/300x450?text=No+Image';
+        const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
+        const mediaTypeLabel = mediaType === 'movie' ? 'Movie' : 'TV Series';
         
         html += `
-            <div class="discovery-item" onclick="showMovieDetails(${item.id}, '${item.media_type || (item.title ? 'movie' : 'tv')}')">
+            <div class="discovery-item" onclick="showMovieDetails(${item.id}, '${mediaType}')">
                 <div class="discovery-poster">
-                    <img src="${posterPath}" alt="${title}" loading="lazy">
+                    <img src="${posterPath}" alt="${itemTitle}" loading="lazy">
+                    <div class="discovery-media-type">${mediaTypeLabel}</div>
+                    <div class="discovery-actions">
+                        <button class="discovery-add-btn" onclick="event.stopPropagation(); addDiscoveryItemToLibrary(${item.id}, '${mediaType}')" title="Add to Library">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="discovery-info">
-                    <h4>${title}</h4>
+                    <h4>${itemTitle}</h4>
                     <div class="discovery-meta">
                         <span class="discovery-year">${year}</span>
                         <span class="discovery-rating">
@@ -1870,6 +1924,72 @@ function displayDiscoveryResults(items, title) {
 
 function closeMovieModal() {
     document.getElementById('movie-modal').classList.remove('active');
+}
+
+async function addDiscoveryItemToLibrary(movieId, mediaType) {
+    const selectedLibraryId = document.getElementById('discovery-library-select').value;
+    
+    if (!selectedLibraryId) {
+        alert('Please select a library first!');
+        return;
+    }
+    
+    const library = libraries.find(lib => lib.id === selectedLibraryId);
+    if (!library) {
+        alert('Library not found!');
+        return;
+    }
+    
+    // Check if item already exists in library
+    const existingItem = library.movies.find(movie => movie.id === movieId && movie.media_type === mediaType);
+    if (existingItem) {
+        alert('This item is already in the selected library!');
+        return;
+    }
+    
+    try {
+        // Fetch movie details
+        let url;
+        if (hasServerlessFunctions) {
+            url = `/api/details?id=${movieId}&type=${mediaType}`;
+        } else {
+            url = `${API_BASE}/${mediaType}/${movieId}?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
+        const movieData = await response.json();
+        
+        // Add to library
+        const movieToAdd = {
+            id: movieData.id,
+            title: movieData.title || movieData.name,
+            year: movieData.release_date ? new Date(movieData.release_date).getFullYear() : 
+                  (movieData.first_air_date ? new Date(movieData.first_air_date).getFullYear() : 'N/A'),
+            rating: movieData.vote_average ? movieData.vote_average.toFixed(1) : 'N/A',
+            poster: movieData.poster_path ? `https://image.tmdb.org/t/p/w300${movieData.poster_path}` : 'https://via.placeholder.com/300x450?text=No+Image',
+            overview: movieData.overview || 'No overview available.',
+            media_type: mediaType,
+            added_date: new Date().toISOString()
+        };
+        
+        library.movies.push(movieToAdd);
+        saveData();
+        
+        // Show success message
+        const button = event.target.closest('.discovery-add-btn');
+        const originalIcon = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i>';
+        button.style.background = '#10b981';
+        
+        setTimeout(() => {
+            button.innerHTML = originalIcon;
+            button.style.background = '#667eea';
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Error adding item to library:', error);
+        alert('Failed to add item to library. Please try again.');
+    }
 }
 
 function openTrailer(trailerKey) {

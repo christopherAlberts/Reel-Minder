@@ -123,13 +123,32 @@
                         <h2>Find Something to Watch</h2>
                         <p>Discover new movies and TV series based on your preferences</p>
                     </div>
+                    
+                    <!-- Discovery Filters -->
+                    <div class="discovery-filters">
+                        <div class="filter-group">
+                            <label for="discovery-media-type">Content Type:</label>
+                            <select id="discovery-media-type" class="filter-select">
+                                <option value="all">Movies & TV Series</option>
+                                <option value="movie">Movies Only</option>
+                                <option value="tv">TV Series Only</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="discovery-library-select">Add to Library:</label>
+                            <select id="discovery-library-select" class="filter-select">
+                                <option value="">Select Library...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <div class="discovery-options">
                         <div class="discovery-card">
                             <div class="discovery-icon">
                                 <i class="fas fa-fire"></i>
                             </div>
                             <h3>Trending Now</h3>
-                            <p>See what's popular right now</p>
+                            <p>See what's popular right now across movies and TV series</p>
                             <button class="btn btn-primary" id="trending-btn">
                                 <i class="fas fa-chart-line"></i>
                                 View Trending
@@ -140,7 +159,7 @@
                                 <i class="fas fa-star"></i>
                             </div>
                             <h3>Top Rated</h3>
-                            <p>Highest rated movies and shows</p>
+                            <p>Highest rated movies and TV series</p>
                             <button class="btn btn-primary" id="top-rated-btn">
                                 <i class="fas fa-trophy"></i>
                                 View Top Rated
@@ -151,7 +170,7 @@
                                 <i class="fas fa-calendar"></i>
                             </div>
                             <h3>Coming Soon</h3>
-                            <p>Upcoming releases</p>
+                            <p>Upcoming movie releases</p>
                             <button class="btn btn-primary" id="upcoming-btn">
                                 <i class="fas fa-clock"></i>
                                 View Upcoming
@@ -162,7 +181,7 @@
                                 <i class="fas fa-random"></i>
                             </div>
                             <h3>Random Pick</h3>
-                            <p>Get a random recommendation</p>
+                            <p>Get a random recommendation from our database</p>
                             <button class="btn btn-primary" id="random-btn">
                                 <i class="fas fa-dice"></i>
                                 Surprise Me
