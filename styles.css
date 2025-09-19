@@ -1978,7 +1978,7 @@ body.dark-mode .season-placeholder i {
 
 .find-something-header p {
     font-size: 1.2rem;
-    color: #aaa;
+    color: white;
     margin: 0;
 }
 
@@ -2122,7 +2122,7 @@ body.dark-mode .season-placeholder i {
 .discovery-welcome {
     text-align: center;
     padding: 3rem;
-    color: #666;
+    color: white;
 }
 
 .discovery-welcome i {
@@ -2141,6 +2141,7 @@ body.dark-mode .season-placeholder i {
 .discovery-welcome p {
     font-size: 1rem;
     margin: 0;
+    color: white;
 }
 
 .discovery-results-header {
@@ -2351,7 +2352,7 @@ body.dark-mode .find-something-header h2 {
 }
 
 body.dark-mode .find-something-header p {
-    color: #e2e8f0;
+    color: white;
 }
 
 body.dark-mode .discovery-quick-btn {
@@ -2399,7 +2400,7 @@ body.dark-mode .discovery-welcome h3 {
 }
 
 body.dark-mode .discovery-welcome p {
-    color: #a0aec0;
+    color: white;
 }
 
 body.dark-mode .discovery-welcome i {
