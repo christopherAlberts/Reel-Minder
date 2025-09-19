@@ -171,14 +171,26 @@ function setupEventListeners() {
     document.getElementById('delete-library-btn').addEventListener('click', deleteCurrentLibrary);
 
     // Discovery buttons
-    document.getElementById('trending-btn').addEventListener('click', () => loadTrendingContent());
-    document.getElementById('top-rated-btn').addEventListener('click', () => loadTopRatedContent());
-    document.getElementById('upcoming-btn').addEventListener('click', () => loadUpcomingContent());
-    document.getElementById('random-btn').addEventListener('click', () => loadRandomContent());
+    document.getElementById('trending-btn').addEventListener('click', () => loadDiscoveryContent('trending'));
+    document.getElementById('top-rated-btn').addEventListener('click', () => loadDiscoveryContent('top-rated'));
+    document.getElementById('upcoming-btn').addEventListener('click', () => loadDiscoveryContent('upcoming'));
+    document.getElementById('random-btn').addEventListener('click', () => loadDiscoveryContent('random'));
 
-    // Discovery filters
-    document.getElementById('discovery-media-type').addEventListener('change', updateDiscoveryFilters);
-    document.getElementById('discovery-library-select').addEventListener('change', updateDiscoveryFilters);
+    // Content type filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            e.target.classList.add('active');
+            // Reload current content with new filter
+            const currentType = e.target.dataset.type;
+            const lastLoadedType = document.getElementById('discovery-results').dataset.lastType;
+            if (lastLoadedType) {
+                loadDiscoveryContent(lastLoadedType);
+            }
+        });
+    });
     document.getElementById('share-library-btn').addEventListener('click', shareCurrentLibrary);
     
     // Movie Sorting in Library
@@ -302,8 +314,16 @@ function switchView(viewName) {
         // Clear search results
         document.getElementById('search-results').innerHTML = '';
     } else if (viewName === 'find-something') {
-        // Populate library dropdown
-        populateDiscoveryLibraryDropdown();
+        // Reset to welcome state
+        const resultsContainer = document.getElementById('discovery-results');
+        resultsContainer.innerHTML = `
+            <div class="discovery-welcome">
+                <i class="fas fa-search"></i>
+                <h3>Ready to Discover?</h3>
+                <p>Click one of the buttons above to start finding great content!</p>
+            </div>
+        `;
+        resultsContainer.removeAttribute('data-last-type');
     }
 }
 
@@ -1730,141 +1750,111 @@ function closeEpisodesModal() {
 }
 
 // Discovery Functions
-function populateDiscoveryLibraryDropdown() {
-    const librarySelect = document.getElementById('discovery-library-select');
-    librarySelect.innerHTML = '<option value="">Select Library...</option>';
-    
-    libraries.forEach(library => {
-        const option = document.createElement('option');
-        option.value = library.id;
-        option.textContent = library.name;
-        librarySelect.appendChild(option);
-    });
-}
-
-function updateDiscoveryFilters() {
-    // This function can be used to update UI based on filter changes
-    // For now, it's a placeholder for future enhancements
-}
-
-async function loadTrendingContent() {
+async function loadDiscoveryContent(type) {
     const resultsContainer = document.getElementById('discovery-results');
-    const mediaType = document.getElementById('discovery-media-type').value;
+    const mediaType = document.querySelector('.filter-btn.active').dataset.type;
+    
+    // Store the current type for filter changes
+    resultsContainer.dataset.lastType = type;
+    
     resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     
     try {
-        let url;
-        if (hasServerlessFunctions) {
-            url = `/api/trending?media_type=${mediaType}`;
-        } else {
-            if (mediaType === 'all') {
-                url = `${API_BASE}/trending/all/week?api_key=${API_KEY}`;
-            } else {
-                url = `${API_BASE}/trending/${mediaType}/week?api_key=${API_KEY}`;
-            }
+        let url, title;
+        
+        switch (type) {
+            case 'trending':
+                if (hasServerlessFunctions) {
+                    url = `/api/trending?media_type=${mediaType}`;
+                } else {
+                    if (mediaType === 'all') {
+                        url = `${API_BASE}/trending/all/week?api_key=${API_KEY}`;
+                    } else {
+                        url = `${API_BASE}/trending/${mediaType}/week?api_key=${API_KEY}`;
+                    }
+                }
+                title = 'Trending Now';
+                break;
+                
+            case 'top-rated':
+                if (hasServerlessFunctions) {
+                    url = `/api/top-rated?media_type=${mediaType}`;
+                } else {
+                    if (mediaType === 'tv') {
+                        url = `${API_BASE}/tv/top_rated?api_key=${API_KEY}`;
+                    } else if (mediaType === 'movie') {
+                        url = `${API_BASE}/movie/top_rated?api_key=${API_KEY}`;
+                    } else {
+                        // For 'all', we'll fetch both and combine
+                        const movieResponse = await fetch(`${API_BASE}/movie/top_rated?api_key=${API_KEY}`);
+                        const tvResponse = await fetch(`${API_BASE}/tv/top_rated?api_key=${API_KEY}`);
+                        const movieData = await movieResponse.json();
+                        const tvData = await tvResponse.json();
+                        
+                        const combinedResults = [...movieData.results.slice(0, 10), ...tvData.results.slice(0, 10)];
+                        displayDiscoveryResults(combinedResults, 'Top Rated Content');
+                        return;
+                    }
+                }
+                title = mediaType === 'tv' ? 'Top Rated TV Series' : 'Top Rated Movies';
+                break;
+                
+            case 'upcoming':
+                if (hasServerlessFunctions) {
+                    url = `/api/upcoming?media_type=${mediaType}`;
+                } else {
+                    if (mediaType === 'tv') {
+                        url = `${API_BASE}/tv/on_the_air?api_key=${API_KEY}`;
+                    } else if (mediaType === 'movie') {
+                        url = `${API_BASE}/movie/upcoming?api_key=${API_KEY}`;
+                    } else {
+                        // For 'all', we'll fetch both and combine
+                        const movieResponse = await fetch(`${API_BASE}/movie/upcoming?api_key=${API_KEY}`);
+                        const tvResponse = await fetch(`${API_BASE}/tv/on_the_air?api_key=${API_KEY}`);
+                        const movieData = await movieResponse.json();
+                        const tvData = await tvResponse.json();
+                        
+                        const combinedResults = [...movieData.results.slice(0, 10), ...tvData.results.slice(0, 10)];
+                        displayDiscoveryResults(combinedResults, 'Coming Soon');
+                        return;
+                    }
+                }
+                title = mediaType === 'tv' ? 'Currently Airing TV Series' : 'Upcoming Movies';
+                break;
+                
+            case 'random':
+                const randomPage = Math.floor(Math.random() * 500) + 1;
+                if (hasServerlessFunctions) {
+                    url = `/api/discover?page=${randomPage}&media_type=${mediaType}`;
+                } else {
+                    if (mediaType === 'tv') {
+                        url = `${API_BASE}/discover/tv?api_key=${API_KEY}&page=${randomPage}`;
+                    } else if (mediaType === 'movie') {
+                        url = `${API_BASE}/discover/movie?api_key=${API_KEY}&page=${randomPage}`;
+                    } else {
+                        // For 'all', pick randomly between movie and tv
+                        const randomType = Math.random() > 0.5 ? 'movie' : 'tv';
+                        url = `${API_BASE}/discover/${randomType}?api_key=${API_KEY}&page=${randomPage}`;
+                    }
+                }
+                title = 'Random Selection';
+                break;
         }
         
         const response = await fetch(url);
         const data = await response.json();
         
-        displayDiscoveryResults(data.results, 'Trending Now');
-        
-    } catch (error) {
-        console.error('Error loading trending content:', error);
-        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load trending content.</p></div>';
-    }
-}
-
-async function loadTopRatedContent() {
-    const resultsContainer = document.getElementById('discovery-results');
-    const mediaType = document.getElementById('discovery-media-type').value;
-    resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-    
-    try {
-        let url;
-        if (hasServerlessFunctions) {
-            url = `/api/top-rated?media_type=${mediaType}`;
-        } else {
-            if (mediaType === 'tv') {
-                url = `${API_BASE}/tv/top_rated?api_key=${API_KEY}`;
-            } else {
-                url = `${API_BASE}/movie/top_rated?api_key=${API_KEY}`;
-            }
+        let results = data.results;
+        if (type === 'random') {
+            // Shuffle and take first 20 for random
+            results = results.sort(() => 0.5 - Math.random()).slice(0, 20);
         }
         
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        const title = mediaType === 'tv' ? 'Top Rated TV Series' : 'Top Rated Movies';
-        displayDiscoveryResults(data.results, title);
+        displayDiscoveryResults(results, title);
         
     } catch (error) {
-        console.error('Error loading top rated content:', error);
-        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load top rated content.</p></div>';
-    }
-}
-
-async function loadUpcomingContent() {
-    const resultsContainer = document.getElementById('discovery-results');
-    const mediaType = document.getElementById('discovery-media-type').value;
-    resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-    
-    try {
-        let url;
-        if (hasServerlessFunctions) {
-            url = `/api/upcoming?media_type=${mediaType}`;
-        } else {
-            if (mediaType === 'tv') {
-                url = `${API_BASE}/tv/on_the_air?api_key=${API_KEY}`;
-            } else {
-                url = `${API_BASE}/movie/upcoming?api_key=${API_KEY}`;
-            }
-        }
-        
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        const title = mediaType === 'tv' ? 'Currently Airing TV Series' : 'Upcoming Movies';
-        displayDiscoveryResults(data.results, title);
-        
-    } catch (error) {
-        console.error('Error loading upcoming content:', error);
-        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load upcoming content.</p></div>';
-    }
-}
-
-async function loadRandomContent() {
-    const resultsContainer = document.getElementById('discovery-results');
-    const mediaType = document.getElementById('discovery-media-type').value;
-    resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-    
-    try {
-        // Get a random page number between 1 and 500
-        const randomPage = Math.floor(Math.random() * 500) + 1;
-        
-        let url;
-        if (hasServerlessFunctions) {
-            url = `/api/discover?page=${randomPage}&media_type=${mediaType}`;
-        } else {
-            if (mediaType === 'tv') {
-                url = `${API_BASE}/discover/tv?api_key=${API_KEY}&page=${randomPage}`;
-            } else {
-                url = `${API_BASE}/discover/movie?api_key=${API_KEY}&page=${randomPage}`;
-            }
-        }
-        
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        // Get a random selection of 20 items
-        const shuffled = data.results.sort(() => 0.5 - Math.random());
-        const randomSelection = shuffled.slice(0, 20);
-        
-        displayDiscoveryResults(randomSelection, 'Random Selection');
-        
-    } catch (error) {
-        console.error('Error loading random content:', error);
-        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load random content.</p></div>';
+        console.error(`Error loading ${type} content:`, error);
+        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load content. Please try again.</p></div>';
     }
 }
 
@@ -1899,7 +1889,7 @@ function displayDiscoveryResults(items, title) {
                     <img src="${posterPath}" alt="${itemTitle}" loading="lazy">
                     <div class="discovery-media-type">${mediaTypeLabel}</div>
                     <div class="discovery-actions">
-                        <button class="discovery-add-btn" onclick="event.stopPropagation(); addDiscoveryItemToLibrary(${item.id}, '${mediaType}')" title="Add to Library">
+                        <button class="discovery-add-btn" onclick="event.stopPropagation(); showLibrarySelectionModal(${item.id}, '${mediaType}', '${itemTitle.replace(/'/g, "\\'")}')" title="Add to Library">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
@@ -1926,15 +1916,55 @@ function closeMovieModal() {
     document.getElementById('movie-modal').classList.remove('active');
 }
 
-async function addDiscoveryItemToLibrary(movieId, mediaType) {
-    const selectedLibraryId = document.getElementById('discovery-library-select').value;
-    
-    if (!selectedLibraryId) {
-        alert('Please select a library first!');
+function showLibrarySelectionModal(movieId, mediaType, movieTitle) {
+    if (libraries.length === 0) {
+        alert('You need to create a library first!');
         return;
     }
     
-    const library = libraries.find(lib => lib.id === selectedLibraryId);
+    // Create modal HTML
+    const modalHtml = `
+        <div class="modal active" id="library-selection-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add "${movieTitle}" to Library</h3>
+                    <button class="close-btn" onclick="closeLibrarySelectionModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Choose which library to add this ${mediaType === 'movie' ? 'movie' : 'TV series'} to:</p>
+                    <div class="library-selection-grid">
+                        ${libraries.map(library => `
+                            <div class="library-selection-item" onclick="addToSelectedLibrary('${library.id}', ${movieId}, '${mediaType}')">
+                                <div class="library-icon">
+                                    <i class="fas fa-folder"></i>
+                                </div>
+                                <div class="library-info">
+                                    <h4>${library.name}</h4>
+                                    <p>${library.movies.length} items</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeLibrarySelectionModal() {
+    const modal = document.getElementById('library-selection-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+async function addToSelectedLibrary(libraryId, movieId, mediaType) {
+    const library = libraries.find(lib => lib.id === libraryId);
     if (!library) {
         alert('Library not found!');
         return;
@@ -1944,6 +1974,7 @@ async function addDiscoveryItemToLibrary(movieId, mediaType) {
     const existingItem = library.movies.find(movie => movie.id === movieId && movie.media_type === mediaType);
     if (existingItem) {
         alert('This item is already in the selected library!');
+        closeLibrarySelectionModal();
         return;
     }
     
@@ -1975,16 +2006,21 @@ async function addDiscoveryItemToLibrary(movieId, mediaType) {
         library.movies.push(movieToAdd);
         saveData();
         
+        // Close modal and show success
+        closeLibrarySelectionModal();
+        
         // Show success message
-        const button = event.target.closest('.discovery-add-btn');
-        const originalIcon = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check"></i>';
-        button.style.background = '#10b981';
+        const successMessage = document.createElement('div');
+        successMessage.className = 'success-toast';
+        successMessage.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            <span>Added to "${library.name}" successfully!</span>
+        `;
+        document.body.appendChild(successMessage);
         
         setTimeout(() => {
-            button.innerHTML = originalIcon;
-            button.style.background = '#667eea';
-        }, 2000);
+            successMessage.remove();
+        }, 3000);
         
     } catch (error) {
         console.error('Error adding item to library:', error);
