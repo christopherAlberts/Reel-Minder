@@ -2711,20 +2711,18 @@ body.dark-mode .ad-bottom {
     }
 
     .nav {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 0.25rem;
         max-width: 100%;
-    }
-
-    .nav .settings-dropdown {
-        display: contents;
+        overflow-x: auto;
+        padding: 0 0.5rem;
     }
 
     .nav-btn {
-        padding: 0.5rem 0.4rem;
-        font-size: 0.65rem;
-        min-height: 40px;
+        padding: 0.4rem 0.3rem;
+        font-size: 0.6rem;
+        min-height: 36px;
         text-align: center;
         white-space: nowrap;
         overflow: hidden;
@@ -2732,12 +2730,14 @@ body.dark-mode .ad-bottom {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.2rem;
-        line-height: 1.1;
+        gap: 0.1rem;
+        line-height: 1;
+        flex: 1;
+        min-width: 0;
     }
 
     .nav-btn i {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         margin: 0;
     }
 
