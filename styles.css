@@ -1994,13 +1994,13 @@ body.dark-mode .season-placeholder i {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    padding: 1.5rem 2rem;
+    padding: 1.5rem 1rem;
     background: white;
     border: 2px solid #e9ecef;
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 120px;
+    width: 140px;
     text-decoration: none;
     color: #333;
 }
@@ -2482,8 +2482,8 @@ body.dark-mode .library-info p {
     }
     
     .discovery-quick-btn {
-        padding: 1rem 1.5rem;
-        min-width: 100px;
+        padding: 1rem 0.75rem;
+        width: 120px;
     }
     
     .discovery-quick-btn i {
