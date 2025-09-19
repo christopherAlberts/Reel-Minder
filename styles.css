@@ -2711,17 +2711,34 @@ body.dark-mode .ad-bottom {
     }
 
     .nav {
-        justify-content: center;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        max-width: 100%;
+    }
+
+    .nav .settings-dropdown {
+        display: contents;
     }
 
     .nav-btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
-        min-height: 32px;
+        padding: 0.5rem 0.4rem;
+        font-size: 0.65rem;
+        min-height: 40px;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.2rem;
+        line-height: 1.1;
     }
 
     .nav-btn i {
         font-size: 0.9rem;
+        margin: 0;
     }
 
     .main-content {
