@@ -1977,7 +1977,7 @@ body.dark-mode .season-placeholder i {
 
 .find-something-header p {
     font-size: 1.2rem;
-    color: #888;
+    color: #aaa;
     margin: 0;
 }
 
@@ -2107,7 +2107,7 @@ body.dark-mode .season-placeholder i {
 }
 
 .discovery-results-header p {
-    color: #888;
+    color: #aaa;
     font-size: 1.1rem;
 }
 
@@ -2205,6 +2205,17 @@ body.dark-mode .season-placeholder i {
     opacity: 1;
 }
 
+/* Always show add button on mobile */
+@media (max-width: 768px) {
+    .discovery-add-btn {
+        opacity: 1 !important;
+        background: rgba(102, 126, 234, 1);
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+}
+
 .discovery-add-btn:hover {
     background: rgba(102, 126, 234, 1);
     transform: scale(1.1);
@@ -2230,7 +2241,7 @@ body.dark-mode .discovery-results-header h3 {
 }
 
 body.dark-mode .discovery-results-header p {
-    color: #cbd5e0;
+    color: #e2e8f0;
 }
 
 body.dark-mode .discovery-item {
@@ -2291,7 +2302,7 @@ body.dark-mode .find-something-header h2 {
 }
 
 body.dark-mode .find-something-header p {
-    color: #cbd5e0;
+    color: #e2e8f0;
 }
 
 body.dark-mode .discovery-quick-btn {
