@@ -1372,10 +1372,14 @@ async function showMovieDetails(movieId, mediaType) {
                     </div>
                     
                     <div class="movie-detail-actions">
-                        ${trailerButtonHtml}
-                        ${episodesButtonHtml}
-                        ${watchedToggleHtml}
-                        ${shareButtonHtml}
+                        <div class="action-group primary-actions">
+                            ${trailerButtonHtml}
+                            ${episodesButtonHtml}
+                        </div>
+                        <div class="action-group secondary-actions">
+                            ${watchedToggleHtml}
+                            ${shareButtonHtml}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1565,7 +1569,7 @@ async function loadSeasonEpisodes(tvId, seasonNumber) {
             const overview = episode.overview || 'No overview available.';
             
             episodesHtml += `
-                <div class="episode-item clickable-episode" onclick="showEpisodeDetails(${tvId}, ${seasonNumber}, ${episode.episode_number})">
+                <div class="episode-item clickable-episode" onclick="redirectToExternalEpisodeInfo('${episode.name || 'Untitled Episode'}', ${seasonNumber}, ${episode.episode_number})">
                     <div class="episode-header">
                         <div class="episode-title">
                             <span class="episode-number">${episode.episode_number}.</span>
@@ -1585,6 +1589,10 @@ async function loadSeasonEpisodes(tvId, seasonNumber) {
                     </div>
                     <div class="episode-overview">
                         ${overview.length > 150 ? overview.substring(0, 150) + '...' : overview}
+                    </div>
+                    <div class="episode-external-link">
+                        <i class="fas fa-external-link-alt"></i>
+                        Click to view on external sites
                     </div>
                 </div>
             `;
@@ -1622,7 +1630,7 @@ async function showEpisodeDetails(tvId, seasonNumber, episodeNumber) {
             throw new Error('Failed to fetch episode data');
         }
         
-        title.textContent = `${episodeData.name || 'Episode Details'}`;
+        title.textContent = 'Details';
         
         const airDate = episodeData.air_date ? new Date(episodeData.air_date).toLocaleDateString() : 'TBA';
         const rating = episodeData.vote_average ? episodeData.vote_average.toFixed(1) : 'N/A';
@@ -1658,6 +1666,51 @@ async function showEpisodeDetails(tvId, seasonNumber, episodeNumber) {
         console.error('Error fetching episode details:', error);
         container.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load episode details. Please try again.</p></div>';
     }
+}
+
+function redirectToExternalEpisodeInfo(episodeName, seasonNumber, episodeNumber) {
+    // Create search query for the episode
+    const searchQuery = encodeURIComponent(`${episodeName} season ${seasonNumber} episode ${episodeNumber}`);
+    
+    // Create URLs for different external sites
+    const imdbUrl = `https://www.imdb.com/find?q=${searchQuery}`;
+    const wikipediaUrl = `https://en.wikipedia.org/wiki/Special:Search?search=${searchQuery}`;
+    
+    // Show a modal with options to choose which site to visit
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Choose External Site</h3>
+                <button class="close-btn" onclick="this.closest('.modal').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Where would you like to view information about this episode?</p>
+                <div class="external-links">
+                    <button class="btn btn-primary" onclick="window.open('${imdbUrl}', '_blank'); this.closest('.modal').remove();">
+                        <i class="fas fa-film"></i>
+                        View on IMDB
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.open('${wikipediaUrl}', '_blank'); this.closest('.modal').remove();">
+                        <i class="fas fa-book"></i>
+                        View on Wikipedia
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
 }
 
 function closeEpisodesModal() {
