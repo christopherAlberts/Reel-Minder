@@ -1996,6 +1996,12 @@ function displayDiscoveryResults(items, title) {
             const titleElement = discoveryItem.querySelector('.discovery-info h4');
             const metaElement = discoveryItem.querySelector('.discovery-meta');
             
+            console.log('Discovery item found:', discoveryItem);
+            console.log('Poster img:', posterImg);
+            console.log('Poster src:', posterImg ? posterImg.src : 'No poster');
+            console.log('Title element:', titleElement);
+            console.log('Meta element:', metaElement);
+            
             let movieData = null;
             if (titleElement && metaElement) {
                 const title = titleElement.textContent;
@@ -2013,6 +2019,10 @@ function displayDiscoveryResults(items, title) {
                     media_type: mediaType,
                     added_date: new Date().toISOString()
                 };
+                
+                console.log('Extracted movie data:', movieData);
+            } else {
+                console.log('Could not extract data - missing elements');
             }
             
             showLibrarySelectionModal(movieId, mediaType, movieTitle, movieData);
@@ -2121,9 +2131,12 @@ async function addToSelectedLibrary(libraryId, movieId, mediaType) {
         }
         
         console.log('Movie data to add:', movieData); // Debug log
+        console.log('Poster URL being saved:', movieData.poster); // Debug log
         
         library.movies.push(movieData);
         saveData();
+        
+        console.log('Movie added to library:', library.movies[library.movies.length - 1]); // Debug log
         
         // Close modal and show success
         closeLibrarySelectionModal();
