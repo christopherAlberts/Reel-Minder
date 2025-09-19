@@ -1966,7 +1966,7 @@ function displayDiscoveryResults(items, title) {
             title: itemTitle,
             year: year,
             rating: rating,
-            poster: posterPath,
+            poster_path: item.poster_path, // Store just the path, not full URL
             overview: item.overview || 'No overview available.',
             media_type: mediaType,
             added_date: new Date().toISOString()
@@ -2113,7 +2113,7 @@ async function addToSelectedLibrary(libraryId, movieId, mediaType) {
                 year: apiData.release_date ? new Date(apiData.release_date).getFullYear() : 
                       (apiData.first_air_date ? new Date(apiData.first_air_date).getFullYear() : 'N/A'),
                 rating: apiData.vote_average ? apiData.vote_average.toFixed(1) : 'N/A',
-                poster: apiData.poster_path ? `https://image.tmdb.org/t/p/w300${apiData.poster_path}` : 'https://via.placeholder.com/300x450?text=No+Image',
+                poster_path: apiData.poster_path, // Store just the path, not full URL
                 overview: apiData.overview || 'No overview available.',
                 media_type: mediaType,
                 added_date: new Date().toISOString()
@@ -2121,7 +2121,7 @@ async function addToSelectedLibrary(libraryId, movieId, mediaType) {
         }
         
         console.log('Movie data to add:', movieData); // Debug log
-        console.log('Poster URL being saved:', movieData.poster); // Debug log
+        console.log('Poster path being saved:', movieData.poster_path); // Debug log
         
         library.movies.push(movieData);
         saveData();
