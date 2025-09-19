@@ -2761,10 +2761,10 @@ body.dark-mode .ad-bottom {
     }
 
     .header-content {
-        padding: 0 1rem;
+        padding: 0;
         flex-direction: column;
         gap: 0.5rem;
-        align-items: center;
+        align-items: stretch;
         justify-content: center;
         text-align: center;
     }
@@ -2784,10 +2784,11 @@ body.dark-mode .ad-bottom {
     }
 
     .nav {
-        display: flex;
-        justify-content: space-between;
-        gap: 0.05rem;
-        padding: 0;
+        display: flex !important;
+        justify-content: space-between !important;
+        gap: 0.05rem !important;
+        padding: 0 !important;
+        width: 100% !important;
     }
 
     .nav-btn {
