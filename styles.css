@@ -171,7 +171,7 @@ body.dark-mode .sort-select option {
 .nav-btn {
     background: none;
     border: none;
-    padding: 0.75rem 1.5rem;
+    padding: 0.6rem 1.5rem;
     border-radius: 25px;
     cursor: pointer;
     font-size: 1rem;
@@ -181,6 +181,11 @@ body.dark-mode .sort-select option {
     align-items: center;
     gap: 0.5rem;
     color: #666;
+}
+
+/* Reduce gap for Find Something to Watch button */
+.nav-btn[data-view="find-something"] {
+    gap: 0.3rem;
 }
 
 .nav-btn:hover {
@@ -2809,9 +2814,9 @@ body.dark-mode .ad-bottom {
     }
 
     .nav-btn {
-        padding: 0.6rem 0.3rem;
+        padding: 0.5rem 0.3rem;
         font-size: 0.7rem;
-        min-height: 60px;
+        min-height: 50px;
         text-align: center;
         display: flex;
         flex-direction: row;
