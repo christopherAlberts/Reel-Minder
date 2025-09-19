@@ -2798,7 +2798,7 @@ body.dark-mode .ad-bottom {
         display: flex !important;
         justify-content: space-between !important;
         gap: 0.3rem !important;
-        padding: 0.25rem !important;
+        padding: 0.1rem 0.5rem !important;
         width: 100% !important;
     }
 
