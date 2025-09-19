@@ -1425,10 +1425,16 @@ body.dark-mode .watched-status:has(.fa-clock) {
 
 .movie-detail-actions {
     display: flex;
+    flex-direction: column;
     gap: 0.75rem;
-    flex-wrap: wrap;
     margin-top: 2rem;
+}
+
+.button-row {
+    display: flex;
+    gap: 0.75rem;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .watch-trailer-btn {
@@ -1493,36 +1499,65 @@ body.dark-mode .watched-status:has(.fa-clock) {
     padding: 1rem;
 }
 
-.season-selector {
+.seasons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
     margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 10px;
-    border: 1px solid #e9ecef;
 }
 
-.season-selector label {
-    display: block;
+.season-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.season-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.season-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 0.5rem;
+}
+
+.season-card-header h4 {
+    font-size: 1.1rem;
     font-weight: 600;
     color: #333;
+    margin: 0;
 }
 
-.season-selector select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    background: white;
-    color: #333;
-    cursor: pointer;
+.season-episode-count {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 500;
 }
 
-.season-selector select:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+.season-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.season-year {
+    font-size: 0.9rem;
+    color: #667eea;
+    font-weight: 500;
+}
+
+.season-card-overview {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.4;
+    margin: 0;
 }
 
 .selected-season-content {
@@ -1814,24 +1849,30 @@ body.dark-mode .episode-external-link {
     border-color: rgba(102, 126, 234, 0.3);
 }
 
-body.dark-mode .season-selector {
+body.dark-mode .season-card {
     background: #2d3748;
     border-color: #4a5568;
 }
 
-body.dark-mode .season-selector label {
-    color: #e2e8f0;
-}
-
-body.dark-mode .season-selector select {
-    background: #1a202c;
-    border-color: #4a5568;
-    color: #e2e8f0;
-}
-
-body.dark-mode .season-selector select:focus {
+body.dark-mode .season-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+}
+
+body.dark-mode .season-card-header h4 {
+    color: #e2e8f0;
+}
+
+body.dark-mode .season-episode-count {
+    color: #a0aec0;
+}
+
+body.dark-mode .season-year {
+    color: #8b9cf7;
+}
+
+body.dark-mode .season-card-overview {
+    color: #cbd5e0;
 }
 
 body.dark-mode .season-placeholder {
@@ -1880,6 +1921,23 @@ body.dark-mode .season-placeholder i {
     
     .episode-overview {
         font-size: 0.85rem;
+    }
+    
+    .seasons-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .season-card {
+        padding: 0.75rem;
+    }
+    
+    .season-card-header h4 {
+        font-size: 1rem;
+    }
+    
+    .season-card-overview {
+        font-size: 0.8rem;
     }
 }
 

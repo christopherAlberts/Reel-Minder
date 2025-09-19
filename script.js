@@ -1372,10 +1372,14 @@ async function showMovieDetails(movieId, mediaType) {
                     </div>
                     
                     <div class="movie-detail-actions">
-                        ${trailerButtonHtml}
-                        ${episodesButtonHtml}
-                        ${watchedToggleHtml}
-                        ${shareButtonHtml}
+                        <div class="button-row">
+                            ${trailerButtonHtml}
+                            ${shareButtonHtml}
+                        </div>
+                        <div class="button-row">
+                            ${episodesButtonHtml}
+                            ${watchedToggleHtml}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1491,25 +1495,34 @@ async function showEpisodes(tvId) {
         let episodesHtml = '';
         
         if (tvData.seasons && tvData.seasons.length > 0) {
-            // Create season dropdown
-            let seasonOptions = '';
+            // Create season cards
+            let seasonCards = '';
             for (const season of tvData.seasons) {
                 const seasonNumber = season.season_number === 0 ? 'Specials' : `Season ${season.season_number}`;
-                seasonOptions += `<option value="${season.season_number}">${seasonNumber} (${season.episode_count || 0} episodes)</option>`;
+                const airYear = season.air_date ? new Date(season.air_date).getFullYear() : '';
+                
+                seasonCards += `
+                    <div class="season-card" onclick="loadSelectedSeason(${tvId}, ${season.season_number}, '${seasonNumber}')">
+                        <div class="season-card-header">
+                            <h4>${seasonNumber}</h4>
+                            <span class="season-episode-count">${season.episode_count || 0} episodes</span>
+                        </div>
+                        <div class="season-card-info">
+                            ${airYear ? `<span class="season-year">${airYear}</span>` : ''}
+                            ${season.overview ? `<p class="season-card-overview">${season.overview.length > 100 ? season.overview.substring(0, 100) + '...' : season.overview}</p>` : ''}
+                        </div>
+                    </div>
+                `;
             }
             
             episodesHtml = `
-                <div class="season-selector">
-                    <label for="season-dropdown">Select Season:</label>
-                    <select id="season-dropdown" onchange="loadSelectedSeason(${tvId}, this.value)">
-                        <option value="">Choose a season...</option>
-                        ${seasonOptions}
-                    </select>
+                <div class="seasons-grid">
+                    ${seasonCards}
                 </div>
                 <div class="selected-season-content" id="selected-season-content">
                     <div class="season-placeholder">
                         <i class="fas fa-tv"></i>
-                        <p>Select a season to view episodes</p>
+                        <p>Click on a season to view episodes</p>
                     </div>
                 </div>
             `;
@@ -1670,18 +1683,13 @@ async function showEpisodeDetails(tvId, seasonNumber, episodeNumber) {
     }
 }
 
-async function loadSelectedSeason(tvId, seasonNumber) {
+async function loadSelectedSeason(tvId, seasonNumber, seasonName) {
     if (!seasonNumber) return;
     
     const contentContainer = document.getElementById('selected-season-content');
     contentContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     
     try {
-        // Get season info from the dropdown
-        const seasonDropdown = document.getElementById('season-dropdown');
-        const selectedOption = seasonDropdown.options[seasonDropdown.selectedIndex];
-        const seasonName = selectedOption.text.split(' (')[0]; // Remove episode count
-        
         // Load episodes for the selected season
         await loadSeasonEpisodes(tvId, parseInt(seasonNumber), seasonName);
         
