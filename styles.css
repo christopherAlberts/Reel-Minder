@@ -2071,6 +2071,54 @@ body.dark-mode .season-placeholder i {
     margin-top: 2rem;
 }
 
+/* Search Section */
+.search-section {
+    margin-bottom: 2rem;
+}
+
+.search-input-container {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.search-btn {
+    padding: 0.75rem 1rem;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-btn:hover {
+    background: #5a6fd8;
+}
+
+.search-btn i {
+    font-size: 1rem;
+}
+
 .discovery-welcome {
     text-align: center;
     padding: 3rem;
@@ -2358,6 +2406,16 @@ body.dark-mode .discovery-welcome i {
     color: #8b9cf7;
 }
 
+body.dark-mode .search-input {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+body.dark-mode .search-input:focus {
+    border-color: #667eea;
+}
+
 /* Library Selection Modal */
 .library-selection-grid {
     display: grid;
@@ -2493,6 +2551,20 @@ body.dark-mode .library-info p {
     
     .discovery-quick-btn span {
         font-size: 0.9rem;
+    }
+    
+    .search-input-container {
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+    
+    .search-input {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+    
+    .search-btn {
+        padding: 0.6rem 0.8rem;
     }
     
     .content-type-filter {

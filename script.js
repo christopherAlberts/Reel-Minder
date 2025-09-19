@@ -176,6 +176,28 @@ function setupEventListeners() {
     document.getElementById('upcoming-btn').addEventListener('click', () => loadDiscoveryContent('upcoming'));
     document.getElementById('random-btn').addEventListener('click', () => loadDiscoveryContent('random'));
 
+    // Search functionality
+    const findSearchBtn = document.getElementById('find-search-btn');
+    const findSearchInput = document.getElementById('find-search-input');
+    
+    if (findSearchBtn && findSearchInput) {
+        findSearchBtn.addEventListener('click', () => {
+            const query = findSearchInput.value.trim();
+            if (query) {
+                searchContent(query);
+            }
+        });
+        
+        findSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = findSearchInput.value.trim();
+                if (query) {
+                    searchContent(query);
+                }
+            }
+        });
+    }
+
     // Content type filter buttons
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -1856,6 +1878,55 @@ async function loadDiscoveryContent(type) {
         console.error(`Error loading ${type} content:`, error);
         resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load content. Please try again.</p></div>';
     }
+}
+
+// Search Function
+async function searchContent(query) {
+    const resultsContainer = document.getElementById('discovery-results');
+    const mediaType = document.querySelector('.filter-btn.active').dataset.type;
+    
+    try {
+        resultsContainer.innerHTML = '<div class="discovery-welcome"><i class="fas fa-spinner fa-spin"></i><h3>Searching...</h3><p>Finding results for "' + query + '"</p></div>';
+        
+        let searchResults = [];
+        
+        if (mediaType === 'all') {
+            // Search both movies and TV shows
+            const [movieResults, tvResults] = await Promise.all([
+                searchMovies(query),
+                searchTVShows(query)
+            ]);
+            searchResults = [...movieResults, ...tvResults];
+        } else if (mediaType === 'movie') {
+            searchResults = await searchMovies(query);
+        } else if (mediaType === 'tv') {
+            searchResults = await searchTVShows(query);
+        }
+        
+        if (searchResults.length === 0) {
+            resultsContainer.innerHTML = '<div class="discovery-welcome"><i class="fas fa-search"></i><h3>No Results Found</h3><p>Try a different search term or check your spelling.</p></div>';
+            return;
+        }
+        
+        // Display search results
+        displayDiscoveryResults(searchResults, `Search Results for "${query}"`);
+        
+    } catch (error) {
+        console.error('Error searching content:', error);
+        resultsContainer.innerHTML = '<div class="discovery-welcome"><i class="fas fa-exclamation-triangle"></i><h3>Search Error</h3><p>Please try again later.</p></div>';
+    }
+}
+
+async function searchMovies(query) {
+    const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=1`);
+    const data = await response.json();
+    return data.results.map(movie => ({ ...movie, media_type: 'movie' }));
+}
+
+async function searchTVShows(query) {
+    const response = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=1`);
+    const data = await response.json();
+    return data.results.map(tv => ({ ...tv, media_type: 'tv' }));
 }
 
 function displayDiscoveryResults(items, title) {
