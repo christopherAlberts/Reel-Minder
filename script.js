@@ -1889,7 +1889,7 @@ function displayDiscoveryResults(items, title) {
                     <img src="${posterPath}" alt="${itemTitle}" loading="lazy">
                     <div class="discovery-media-type">${mediaTypeLabel}</div>
                     <div class="discovery-actions">
-                        <button class="discovery-add-btn" onclick="event.stopPropagation(); showLibrarySelectionModal(${item.id}, '${mediaType}', '${itemTitle.replace(/'/g, "\\'")}')" title="Add to Library">
+                        <button class="discovery-add-btn" data-movie-id="${item.id}" data-media-type="${mediaType}" data-movie-title="${itemTitle}" title="Add to Library">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
@@ -1910,6 +1910,17 @@ function displayDiscoveryResults(items, title) {
     
     html += '</div>';
     resultsContainer.innerHTML = html;
+    
+    // Add event listeners for add buttons
+    resultsContainer.querySelectorAll('.discovery-add-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const movieId = btn.dataset.movieId;
+            const mediaType = btn.dataset.mediaType;
+            const movieTitle = btn.dataset.movieTitle;
+            showLibrarySelectionModal(movieId, mediaType, movieTitle);
+        });
+    });
 }
 
 function closeMovieModal() {

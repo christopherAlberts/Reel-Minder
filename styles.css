@@ -1977,7 +1977,7 @@ body.dark-mode .season-placeholder i {
 
 .find-something-header p {
     font-size: 1.2rem;
-    color: #666;
+    color: #888;
     margin: 0;
 }
 
@@ -2107,7 +2107,7 @@ body.dark-mode .season-placeholder i {
 }
 
 .discovery-results-header p {
-    color: #666;
+    color: #888;
     font-size: 1.1rem;
 }
 
@@ -2230,7 +2230,7 @@ body.dark-mode .discovery-results-header h3 {
 }
 
 body.dark-mode .discovery-results-header p {
-    color: #a0aec0;
+    color: #cbd5e0;
 }
 
 body.dark-mode .discovery-item {
@@ -2291,7 +2291,7 @@ body.dark-mode .find-something-header h2 {
 }
 
 body.dark-mode .find-something-header p {
-    color: #a0aec0;
+    color: #cbd5e0;
 }
 
 body.dark-mode .discovery-quick-btn {
