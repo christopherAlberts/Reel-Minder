@@ -926,6 +926,27 @@ body.dark-mode .library-actions-card .btn:hover {
     font-weight: 600;
 }
 
+.movie-poster-container {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    overflow: hidden;
+}
+
+.movie-media-type {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    z-index: 2;
+}
+
 /* Layout Views */
 .library-movies.poster-view {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -937,9 +958,15 @@ body.dark-mode .library-actions-card .btn:hover {
     text-align: center;
 }
 
-.library-movies.poster-view .movie-poster {
+.library-movies.poster-view .movie-poster-container {
     height: 200px;
     margin-bottom: 0.5rem;
+}
+
+.library-movies.poster-view .movie-poster {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
     border-radius: 8px;
 }
 
@@ -981,12 +1008,25 @@ body.dark-mode .library-actions-card .btn:hover {
     border-radius: 8px;
 }
 
-.library-movies.list-view .movie-poster {
+.library-movies.list-view .movie-poster-container {
     width: 40px;
     height: 60px;
     margin-bottom: 0;
-    border-radius: 4px;
     flex-shrink: 0;
+}
+
+.library-movies.list-view .movie-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.library-movies.list-view .movie-media-type {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.3rem;
+    top: 0.25rem;
+    left: 0.25rem;
 }
 
 .library-movies.list-view .movie-info {
@@ -1505,6 +1545,154 @@ body.dark-mode .watched-status:has(.fa-clock) {
     font-weight: 600;
 }
 
+/* Streaming Availability Section */
+.streaming-availability-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e9ecef;
+}
+
+.streaming-availability-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.streaming-availability-header h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.streaming-availability-header h4 i {
+    color: #667eea;
+    font-size: 1.4rem;
+}
+
+.streaming-availability-header p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.streaming-services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.streaming-service-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #333;
+}
+
+.streaming-service-item:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+    text-decoration: none;
+    color: #333;
+}
+
+.streaming-service-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    object-fit: contain;
+    background: #f8f9fa;
+    padding: 0.5rem;
+}
+
+.streaming-service-logo-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.7rem;
+    text-align: center;
+}
+
+.streaming-service-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.streaming-unavailable {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: #666;
+}
+
+.streaming-unavailable i {
+    color: #667eea;
+    margin-right: 0.5rem;
+}
+
+/* Dark mode for streaming availability */
+body.dark-mode .streaming-availability-section {
+    border-top-color: #4a5568;
+}
+
+body.dark-mode .streaming-availability-header h4 {
+    color: #e2e8f0;
+}
+
+body.dark-mode .streaming-availability-header h4 i {
+    color: #8b9cf7;
+}
+
+body.dark-mode .streaming-availability-header p {
+    color: #a0aec0;
+}
+
+body.dark-mode .streaming-service-item {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+body.dark-mode .streaming-service-item:hover {
+    border-color: #8b9cf7;
+    box-shadow: 0 4px 15px rgba(139, 156, 247, 0.15);
+    color: #e2e8f0;
+}
+
+body.dark-mode .streaming-service-logo {
+    background: #1a202c;
+}
+
+body.dark-mode .streaming-service-name {
+    color: #e2e8f0;
+}
+
+body.dark-mode .streaming-unavailable {
+    background: #2d3748;
+    color: #a0aec0;
+}
+
+body.dark-mode .streaming-unavailable i {
+    color: #8b9cf7;
+}
+
 /* Episodes Modal Styles */
 .episodes-content {
     padding: 1rem;
@@ -1988,7 +2176,7 @@ body.dark-mode .season-placeholder i {
 .find-something-header h2 {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #333;
+    color: white;
     margin-bottom: 0.5rem;
 }
 
@@ -2083,6 +2271,26 @@ body.dark-mode .season-placeholder i {
     color: white;
 }
 
+/* Genre Dropdown Styles (now part of search container) */
+
+.genre-dropdown {
+    min-width: 150px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.genre-dropdown:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+
 .discovery-results {
     margin-top: 2rem;
 }
@@ -2095,8 +2303,206 @@ body.dark-mode .season-placeholder i {
 .search-input-container {
     display: flex;
     gap: 0.5rem;
-    max-width: 500px;
+    max-width: 600px;
+    margin: 0 auto 1rem auto;
+    align-items: center;
+}
+
+/* Advanced Filters Toggle */
+.advanced-filters-toggle {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: #333;
+    backdrop-filter: blur(10px);
+}
+
+.toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #667eea;
+    transform: translateY(-1px);
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.toggle-btn.active .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* Advanced Filters */
+.advanced-filters {
+    max-width: 1000px;
     margin: 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filter-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: end;
+}
+
+.filter-row:last-child {
+    margin-bottom: 0;
+}
+
+.filter-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.filter-input,
+.filter-dropdown {
+    padding: 0.6rem 0.8rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.filter-input:focus,
+.filter-dropdown:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.filter-input::placeholder {
+    color: #999;
+    font-size: 0.85rem;
+}
+
+/* Checkbox Group */
+.checkbox-group {
+    justify-content: center;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    margin: 0;
+    padding: 0.6rem 0.8rem;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.checkbox-label:hover {
+    border-color: #667eea;
+    background: #f8f9fa;
+}
+
+.filter-checkbox {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: #667eea;
+}
+
+.checkbox-text {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Clear Filters Button */
+.clear-filters-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    align-self: flex-end;
+}
+
+/* Dark mode for advanced filters */
+body.dark-mode .toggle-btn {
+    background: rgba(45, 55, 72, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
+body.dark-mode .toggle-btn:hover {
+    background: rgba(45, 55, 72, 0.5);
+    border-color: #667eea;
+}
+
+body.dark-mode .advanced-filters {
+    background: rgba(45, 55, 72, 0.3);
+}
+
+body.dark-mode .filter-group label {
+    color: #e2e8f0;
+}
+
+body.dark-mode .filter-input,
+body.dark-mode .filter-dropdown {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+body.dark-mode .filter-input:focus,
+body.dark-mode .filter-dropdown:focus {
+    border-color: #667eea;
+}
+
+body.dark-mode .filter-input::placeholder {
+    color: #a0aec0;
+}
+
+body.dark-mode .checkbox-label {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+body.dark-mode .checkbox-label:hover {
+    border-color: #667eea;
+    background: #374151;
+}
+
+body.dark-mode .checkbox-text {
+    color: #e2e8f0;
 }
 
 .search-input {
@@ -2330,6 +2736,53 @@ body.dark-mode .discovery-rating {
     color: #f39c12;
 }
 
+/* Load More Button */
+.discovery-load-more {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#load-more-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+#load-more-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+#load-more-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#load-more-btn:disabled:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: none;
+}
+
+/* Dark mode for load more button */
+body.dark-mode #load-more-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode #load-more-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
 /* Mobile responsive styles for discovery results */
 @media (max-width: 768px) {
     .discovery-results-header h3 {
@@ -2359,6 +2812,16 @@ body.dark-mode .discovery-rating {
     
     .discovery-meta {
         font-size: 0.8rem;
+    }
+    
+    .discovery-load-more {
+        margin-top: 1.5rem;
+        padding-top: 0.75rem;
+    }
+    
+    #load-more-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
     }
 }
 
@@ -2409,6 +2872,23 @@ body.dark-mode .filter-btn.active {
     background: #8b9cf7;
     border-color: #8b9cf7;
     color: white;
+}
+
+/* Dark mode for genre dropdown */
+
+body.dark-mode .genre-dropdown {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+body.dark-mode .genre-dropdown:focus {
+    border-color: #667eea;
+}
+
+body.dark-mode .genre-dropdown option {
+    background: #2d3748;
+    color: #e2e8f0;
 }
 
 body.dark-mode .discovery-welcome h3 {
@@ -2573,6 +3053,8 @@ body.dark-mode .library-info p {
     .search-input-container {
         max-width: 100%;
         padding: 0 1rem;
+        flex-direction: column;
+        gap: 0.75rem;
     }
     
     .search-input {
@@ -2580,8 +3062,52 @@ body.dark-mode .library-info p {
         padding: 0.6rem 0.8rem;
     }
     
+    .filter-dropdown {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+        min-width: auto;
+        width: 100%;
+    }
+    
     .search-btn {
         padding: 0.6rem 0.8rem;
+        width: 100%;
+    }
+    
+    .toggle-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .advanced-filters {
+        margin: 0 1rem;
+        padding: 1rem;
+    }
+    
+    .filter-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .filter-input,
+    .filter-dropdown {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.7rem;
+    }
+    
+    .checkbox-label {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.85rem;
+    }
+    
+    .clear-filters-btn {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
     }
     
     .content-type-filter {
@@ -2598,6 +3124,7 @@ body.dark-mode .library-info p {
         padding: 0.4rem 0.8rem;
         font-size: 0.9rem;
     }
+    
     
     .discovery-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -2955,9 +3482,16 @@ body.dark-mode .ad-bottom {
         gap: 0.5rem;
     }
     
-    .library-movies.list-view .movie-poster {
+    .library-movies.list-view .movie-poster-container {
         width: 35px;
         height: 50px;
+    }
+    
+    .library-movies.list-view .movie-media-type {
+        font-size: 0.5rem;
+        padding: 0.1rem 0.2rem;
+        top: 0.15rem;
+        left: 0.15rem;
     }
     
     .library-movies.list-view .movie-info {
@@ -3021,6 +3555,33 @@ body.dark-mode .ad-bottom {
 
     .form-actions {
         flex-direction: column;
+    }
+    
+    /* Mobile styles for streaming availability */
+    .streaming-services-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .streaming-service-item {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .streaming-service-logo {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .streaming-service-name {
+        font-size: 0.7rem;
+    }
+    
+    .streaming-availability-header h4 {
+        font-size: 1.1rem;
+    }
+    
+    .streaming-availability-header p {
+        font-size: 0.8rem;
     }
 
 }

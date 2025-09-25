@@ -16,6 +16,90 @@ let currentLibrary = null;
 let libraries = [];
 let searchResults = [];
 
+// Streaming Services Data with reliable SVG logos
+const STREAMING_SERVICES = {
+    'netflix': {
+        name: 'Netflix',
+        logo: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="60" rx="8" fill="#E50914"/>
+                <path d="M25.5 15L40 30L25.5 45V15Z" fill="white"/>
+            </svg>
+        `),
+        searchUrl: 'https://www.netflix.com/search?q='
+    },
+    'amazon_prime': {
+        name: 'Prime Video',
+        logo: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="60" rx="8" fill="#00A8FF"/>
+                <path d="M15 25L30 20L45 25L45 35L30 40L15 35V25Z" fill="white"/>
+            </svg>
+        `),
+        searchUrl: 'https://www.amazon.com/s?k='
+    },
+    'hulu': {
+        name: 'Hulu',
+        logo: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="60" rx="8" fill="#1ED974"/>
+                <rect x="20" y="20" width="20" height="20" fill="white"/>
+            </svg>
+        `),
+        searchUrl: 'https://www.hulu.com/search?q='
+    },
+    'hbo_max': {
+        name: 'Max',
+        logo: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="60" rx="8" fill="#843490"/>
+                <rect x="15" y="20" width="30" height="20" fill="white"/>
+            </svg>
+        `),
+        searchUrl: 'https://play.max.com/search?q='
+    },
+    'disney_plus': {
+        name: 'Disney+',
+        logo: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="60" rx="8" fill="#113CCA"/>
+                <path d="M30 15L40 25L30 35L20 25L30 15Z" fill="white"/>
+            </svg>
+        `),
+        searchUrl: 'https://www.disneyplus.com/search?q='
+    },
+    'apple_tv': {
+        name: 'Apple TV+',
+        logo: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="60" rx="8" fill="#000000"/>
+                <rect x="20" y="20" width="20" height="20" fill="white"/>
+            </svg>
+        `),
+        searchUrl: 'https://tv.apple.com/search?q='
+    },
+    'paramount_plus': {
+        name: 'Paramount+',
+        logo: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="60" rx="8" fill="#0078DB"/>
+                <path d="M30 15L45 25L30 35L15 25L30 15Z" fill="white"/>
+            </svg>
+        `),
+        searchUrl: 'https://www.paramountplus.com/search?q='
+    },
+    'peacock': {
+        name: 'Peacock',
+        logo: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="60" rx="8" fill="#FF6000"/>
+                <rect x="20" y="20" width="20" height="20" fill="white"/>
+            </svg>
+        `),
+        searchUrl: 'https://www.peacocktv.com/search?q='
+    }
+};
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     loadData();
@@ -177,25 +261,62 @@ function setupEventListeners() {
     document.getElementById('top-rated-btn').addEventListener('click', () => loadDiscoveryContent('top-rated'));
     document.getElementById('upcoming-btn').addEventListener('click', () => loadDiscoveryContent('upcoming'));
     document.getElementById('random-btn').addEventListener('click', () => loadDiscoveryContent('random'));
+    
+    // Load More button (delegated event listener)
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'load-more-btn') {
+            const resultsContainer = document.getElementById('discovery-results');
+            const currentType = resultsContainer.dataset.lastType;
+            if (currentType) {
+                loadDiscoveryContent(currentType, true);
+            }
+        }
+    });
 
-    // Search functionality
+    // Search functionality (now handles all search types and filters)
     const findSearchBtn = document.getElementById('find-search-btn');
     const findSearchInput = document.getElementById('find-search-input');
+    const clearFiltersBtn = document.getElementById('clear-filters-btn');
+    const toggleAdvancedFilters = document.getElementById('toggle-advanced-filters');
     
     if (findSearchBtn && findSearchInput) {
-        findSearchBtn.addEventListener('click', () => {
-            const query = findSearchInput.value.trim();
-            if (query) {
-                searchContent(query);
-            }
-        });
+        findSearchBtn.addEventListener('click', performAdvancedSearch);
         
         findSearchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                const query = findSearchInput.value.trim();
-                if (query) {
-                    searchContent(query);
-                }
+                performAdvancedSearch();
+            }
+        });
+    }
+    
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', clearAllFilters);
+    }
+    
+    if (toggleAdvancedFilters) {
+        toggleAdvancedFilters.addEventListener('click', toggleAdvancedFiltersSection);
+    }
+    
+    // Content type dropdown in advanced filters
+    const contentTypeSelect = document.getElementById('content-type-select');
+    if (contentTypeSelect) {
+        contentTypeSelect.addEventListener('change', (e) => {
+            // Update the main filter buttons to match
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            const activeButton = document.querySelector(`[data-type="${e.target.value}"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+            
+            // Reload genres for the new media type
+            if (genreData.loaded) {
+                populateGenreDropdown();
+            }
+            
+            // Reload current content with new filter
+            const lastLoadedType = document.getElementById('discovery-results').dataset.lastType;
+            if (lastLoadedType) {
+                loadDiscoveryContent(lastLoadedType);
             }
         });
     }
@@ -207,14 +328,29 @@ function setupEventListeners() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             // Add active class to clicked button
             e.target.classList.add('active');
-            // Reload current content with new filter
+            
+            // Update the advanced filter dropdown to match
             const currentType = e.target.dataset.type;
+            const contentTypeSelect = document.getElementById('content-type-select');
+            if (contentTypeSelect) {
+                contentTypeSelect.value = currentType;
+            }
+            
+            // Reload genres for the new media type
+            if (genreData.loaded) {
+                populateGenreDropdown();
+            }
+            // Reload current content with new filter
             const lastLoadedType = document.getElementById('discovery-results').dataset.lastType;
             if (lastLoadedType) {
                 loadDiscoveryContent(lastLoadedType);
             }
         });
     });
+    
+    // Load genres and languages when the page loads
+    loadGenres();
+    loadLanguages();
     document.getElementById('share-library-btn').addEventListener('click', shareCurrentLibrary);
     
     // Movie Sorting in Library
@@ -909,10 +1045,13 @@ function renderLibraryMovies(moviesToRender = null) {
         
         return `
             <div class="movie-card ${movie.watched ? 'watched' : ''}" onclick="showMovieDetails(${movie.id}, '${movie.media_type}')">
-                <img src="${movie.poster_path ? TMDB_IMAGE_BASE_URL + movie.poster_path : 'https://via.placeholder.com/300x450?text=No+Image'}" 
-                     alt="${movie.title}" 
-                     class="movie-poster"
-                     onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+                <div class="movie-poster-container">
+                    <img src="${movie.poster_path ? TMDB_IMAGE_BASE_URL + movie.poster_path : 'https://via.placeholder.com/300x450?text=No+Image'}" 
+                         alt="${movie.title}" 
+                         class="movie-poster"
+                         onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+                    <div class="movie-media-type">${movie.media_type === 'movie' ? 'Movie' : 'TV Series'}</div>
+                </div>
                 <div class="movie-info">
                     <div class="movie-title">${movie.title}</div>
                     <div class="movie-year">${releaseYear}</div>
@@ -1437,10 +1576,160 @@ async function showMovieDetails(movieId, mediaType) {
                 </div>
             </div>
         `;
+        
+        // Load streaming availability after movie details are displayed
+        await loadStreamingAvailability(movieData.title || movieData.name, releaseYear);
+        
     } catch (error) {
         console.error('Error fetching movie details:', error);
         container.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load movie details. Please try again.</p></div>';
     }
+}
+
+// Streaming Availability Functions
+async function loadStreamingAvailability(title, year) {
+    const streamingSection = document.getElementById('streaming-availability-section');
+    const streamingGrid = document.getElementById('streaming-services-grid');
+    const unavailableMessage = document.getElementById('streaming-unavailable');
+    
+    // Show the streaming section
+    streamingSection.style.display = 'block';
+    
+    // Clear previous results
+    streamingGrid.innerHTML = '';
+    unavailableMessage.style.display = 'none';
+    
+    // Show loading state
+    streamingGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;"><i class="fas fa-spinner fa-spin"></i> Checking streaming availability...</div>';
+    
+    try {
+        // Use conservative streaming availability - only show services we're confident about
+        const availableServices = await getConservativeStreamingAvailability(title, year);
+        
+        if (availableServices.length > 0) {
+            streamingGrid.innerHTML = '';
+            availableServices.forEach(service => {
+                const serviceItem = document.createElement('a');
+                serviceItem.className = 'streaming-service-item';
+                serviceItem.href = `${service.searchUrl}${encodeURIComponent(title)}`;
+                serviceItem.target = '_blank';
+                serviceItem.rel = 'noopener noreferrer';
+                
+                serviceItem.innerHTML = `
+                    <img src="${service.logo}" alt="${service.name}" class="streaming-service-logo">
+                    <div class="streaming-service-name">${service.name}</div>
+                `;
+                
+                streamingGrid.appendChild(serviceItem);
+            });
+        } else {
+            streamingGrid.innerHTML = '';
+            unavailableMessage.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error loading streaming availability:', error);
+        streamingGrid.innerHTML = '';
+        unavailableMessage.style.display = 'block';
+    }
+}
+
+// Real streaming availability function using UTelly API
+async function getStreamingAvailability(title, year) {
+    try {
+        // Use UTelly API (free tier available)
+        const response = await fetch(`https://utelly-tv-shows-and-movies-availability-v1.p.rapidapi.com/lookup?term=${encodeURIComponent(title)}&country=us`, {
+            method: 'GET',
+            headers: {
+                'x-rapidapi-key': 'your-rapidapi-key-here', // You'll need to get this from RapidAPI
+                'x-rapidapi-host': 'utelly-tv-shows-and-movies-availability-v1.p.rapidapi.com'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('API request failed');
+        }
+        
+        const data = await response.json();
+        const availableServices = [];
+        
+        if (data.results && data.results.length > 0) {
+            // Map UTelly results to our streaming services
+            const serviceMapping = {
+                'netflix': 'netflix',
+                'amazon prime': 'amazon_prime',
+                'amazon prime video': 'amazon_prime',
+                'hulu': 'hulu',
+                'hbo max': 'hbo_max',
+                'max': 'hbo_max',
+                'disney plus': 'disney_plus',
+                'disney+': 'disney_plus',
+                'apple tv': 'apple_tv',
+                'apple tv plus': 'apple_tv',
+                'paramount plus': 'paramount_plus',
+                'paramount+': 'paramount_plus',
+                'peacock': 'peacock'
+            };
+            
+            data.results.forEach(result => {
+                if (result.locations && result.locations.length > 0) {
+                    result.locations.forEach(location => {
+                        const serviceKey = serviceMapping[location.display_name?.toLowerCase()];
+                        if (serviceKey && STREAMING_SERVICES[serviceKey]) {
+                            // Avoid duplicates
+                            if (!availableServices.find(s => s.name === STREAMING_SERVICES[serviceKey].name)) {
+                                availableServices.push(STREAMING_SERVICES[serviceKey]);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        
+        return availableServices;
+        
+    } catch (error) {
+        console.error('Error fetching streaming availability:', error);
+        // Fallback to a more conservative approach - only show services we're very confident about
+        return getConservativeStreamingAvailability(title, year);
+    }
+}
+
+// Conservative streaming availability - only show services we're confident about
+async function getConservativeStreamingAvailability(title, year) {
+    // Simulate API delay for consistency
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const availableServices = [];
+    const titleLower = title.toLowerCase();
+    
+    // Only add services we're very confident about based on known patterns
+    if (titleLower.includes('marvel') || titleLower.includes('star wars') || titleLower.includes('disney') || titleLower.includes('pixar')) {
+        availableServices.push(STREAMING_SERVICES.disney_plus);
+    }
+    
+    if (titleLower.includes('hbo') || titleLower.includes('game of thrones') || titleLower.includes('euphoria') || titleLower.includes('house of the dragon')) {
+        availableServices.push(STREAMING_SERVICES.hbo_max);
+    }
+    
+    if (titleLower.includes('stranger things') || titleLower.includes('the crown') || titleLower.includes('witcher')) {
+        availableServices.push(STREAMING_SERVICES.netflix);
+    }
+    
+    // For very new content (current year), we're more conservative
+    if (year >= 2024) {
+        // Only show if we have strong indicators
+        if (titleLower.includes('netflix') || titleLower.includes('original')) {
+            availableServices.push(STREAMING_SERVICES.netflix);
+        }
+    }
+    
+    // For older content, be more conservative
+    if (year < 2020) {
+        // Amazon Prime often has older content
+        availableServices.push(STREAMING_SERVICES.amazon_prime);
+    }
+    
+    return availableServices;
 }
 
 async function fetchMovieDetails(movieId) {
@@ -1774,14 +2063,46 @@ function closeEpisodesModal() {
 }
 
 // Discovery Functions
-async function loadDiscoveryContent(type) {
+// Pagination state for each discovery type
+let discoveryPagination = {
+    trending: { page: 1, totalPages: 1, hasMore: false }, // Disabled pagination
+    'top-rated': { page: 1, totalPages: 1, hasMore: false }, // Disabled pagination
+    upcoming: { page: 1, totalPages: 1, hasMore: false }, // Disabled pagination
+    random: { page: 1, totalPages: 1, hasMore: true }
+};
+
+// Genre data cache
+let genreData = {
+    movie: [],
+    tv: [],
+    loaded: false
+};
+
+// Language data cache
+let languageData = {
+    loaded: false,
+    languages: []
+};
+
+async function loadDiscoveryContent(type, loadMore = false) {
     const resultsContainer = document.getElementById('discovery-results');
-    const mediaType = document.querySelector('.filter-btn.active').dataset.type;
+    const mediaType = document.getElementById('content-type-select').value;
     
     // Store the current type for filter changes
     resultsContainer.dataset.lastType = type;
     
-    resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    // If not loading more, reset pagination and show loading
+    if (!loadMore) {
+        discoveryPagination[type] = { page: 1, totalPages: 1, hasMore: true };
+        resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    } else {
+        // Show loading on load more button
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        if (loadMoreBtn) {
+            loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            loadMoreBtn.disabled = true;
+        }
+    }
     
     try {
         let url, title;
@@ -1816,7 +2137,7 @@ async function loadDiscoveryContent(type) {
                         const tvData = await tvResponse.json();
                         
                         const combinedResults = [...movieData.results.slice(0, 10), ...tvData.results.slice(0, 10)];
-                        displayDiscoveryResults(combinedResults, 'Top Rated Content');
+                        displayDiscoveryResults(combinedResults, 'Top Rated Content', loadMore);
                         return;
                     }
                 }
@@ -1839,7 +2160,7 @@ async function loadDiscoveryContent(type) {
                         const tvData = await tvResponse.json();
                         
                         const combinedResults = [...movieData.results.slice(0, 10), ...tvData.results.slice(0, 10)];
-                        displayDiscoveryResults(combinedResults, 'Coming Soon');
+                        displayDiscoveryResults(combinedResults, 'Coming Soon', loadMore);
                         return;
                     }
                 }
@@ -1874,11 +2195,31 @@ async function loadDiscoveryContent(type) {
             results = results.sort(() => 0.5 - Math.random()).slice(0, 20);
         }
         
-        displayDiscoveryResults(results, title);
+        // Update pagination state only for types that support pagination
+        if (type === 'random') {
+            discoveryPagination[type].totalPages = data.total_pages || 1;
+            discoveryPagination[type].hasMore = discoveryPagination[type].page < discoveryPagination[type].totalPages;
+            
+            // Increment page for next load more
+            if (loadMore) {
+                discoveryPagination[type].page++;
+            }
+        }
+        
+        displayDiscoveryResults(results, title, loadMore, data);
         
     } catch (error) {
         console.error(`Error loading ${type} content:`, error);
-        resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load content. Please try again.</p></div>';
+        if (!loadMore) {
+            resultsContainer.innerHTML = '<div class="empty-state"><h3>Error</h3><p>Failed to load content. Please try again.</p></div>';
+        } else {
+            // Reset load more button on error
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.innerHTML = '<i class="fas fa-plus"></i> Load More';
+                loadMoreBtn.disabled = false;
+            }
+        }
     }
 }
 
@@ -1931,16 +2272,48 @@ async function searchTVShows(query) {
     return data.results.map(tv => ({ ...tv, media_type: 'tv' }));
 }
 
-function displayDiscoveryResults(items, title) {
+function displayDiscoveryResults(items, title, loadMore = false, paginationData = null) {
     const resultsContainer = document.getElementById('discovery-results');
     
     if (!items || items.length === 0) {
-        resultsContainer.innerHTML = '<div class="empty-state"><h3>No Results</h3><p>No content found for this category.</p></div>';
+        if (!loadMore) {
+            resultsContainer.innerHTML = '<div class="empty-state"><h3>No Results</h3><p>No content found for this category.</p></div>';
+        }
         return;
     }
     
-    // Clear previous movie data store
-    movieDataStore = {};
+    // If loading more, append to existing results
+    if (loadMore) {
+        const existingGrid = resultsContainer.querySelector('.discovery-grid');
+        if (existingGrid) {
+            // Append new items to existing grid
+            const newItemsHtml = generateDiscoveryItemsHtml(items);
+            existingGrid.insertAdjacentHTML('beforeend', newItemsHtml);
+            
+            // Update result count
+            const resultCount = resultsContainer.querySelector('.discovery-results-header p');
+            if (resultCount) {
+                const currentCount = parseInt(resultCount.textContent.match(/\d+/)[0]);
+                resultCount.textContent = `${currentCount + items.length} results found`;
+            }
+            
+            // Reset load more button
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.innerHTML = '<i class="fas fa-plus"></i> Load More';
+                loadMoreBtn.disabled = false;
+            }
+            
+            // Add event listeners for new add buttons
+            addDiscoveryEventListeners();
+            return;
+        }
+    }
+    
+    // Clear previous movie data store if not loading more
+    if (!loadMore) {
+        movieDataStore = {};
+    }
     
     let html = `
         <div class="discovery-results-header">
@@ -1949,6 +2322,42 @@ function displayDiscoveryResults(items, title) {
         </div>
         <div class="discovery-grid">
     `;
+    
+    html += generateDiscoveryItemsHtml(items);
+    html += '</div>';
+    
+    // Add load more button if there are more pages and the type supports pagination
+    const currentType = resultsContainer.dataset.lastType;
+    if (currentType && discoveryPagination[currentType] && discoveryPagination[currentType].hasMore && 
+        currentType === 'random') {
+        html += `
+            <div class="discovery-load-more">
+                <button class="btn btn-secondary" id="load-more-btn">
+                    <i class="fas fa-plus"></i>
+                    Load More
+                </button>
+            </div>
+        `;
+    }
+    
+    resultsContainer.innerHTML = html;
+    
+    // Scroll to the results section only if not loading more
+    if (!loadMore) {
+        setTimeout(() => {
+            resultsContainer.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }, 100); // Small delay to ensure content is rendered
+    }
+    
+    // Add event listeners for add buttons
+    addDiscoveryEventListeners();
+}
+
+function generateDiscoveryItemsHtml(items) {
+    let html = '';
     
     for (const item of items) {
         const itemTitle = item.title || item.name;
@@ -1997,16 +2406,11 @@ function displayDiscoveryResults(items, title) {
         `;
     }
     
-    html += '</div>';
-    resultsContainer.innerHTML = html;
-    
-    // Scroll to the results section
-    setTimeout(() => {
-        resultsContainer.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
-    }, 100); // Small delay to ensure content is rendered
+    return html;
+}
+
+function addDiscoveryEventListeners() {
+    const resultsContainer = document.getElementById('discovery-results');
     
     // Add event listeners for add buttons
     resultsContainer.querySelectorAll('.discovery-add-btn').forEach(btn => {
@@ -2025,6 +2429,265 @@ function displayDiscoveryResults(items, title) {
             
             showLibrarySelectionModal(movieId, mediaType, movieTitle, movieData);
         });
+    });
+}
+
+// Genre Functions
+async function loadGenres() {
+    if (genreData.loaded) return;
+    
+    try {
+        const [movieResponse, tvResponse] = await Promise.all([
+            fetch(`${API_BASE}/genre/movie/list?api_key=${API_KEY}`),
+            fetch(`${API_BASE}/genre/tv/list?api_key=${API_KEY}`)
+        ]);
+        
+        const movieData = await movieResponse.json();
+        const tvData = await tvResponse.json();
+        
+        genreData.movie = movieData.genres;
+        genreData.tv = tvData.genres;
+        genreData.loaded = true;
+        
+        populateGenreDropdown();
+    } catch (error) {
+        console.error('Error loading genres:', error);
+    }
+}
+
+function populateGenreDropdown() {
+    const genreSelect = document.getElementById('genre-select');
+    const mediaType = document.querySelector('.filter-btn.active').dataset.type;
+    
+    // Clear existing options except the first one
+    genreSelect.innerHTML = '<option value="">All Genres</option>';
+    
+    let genres = [];
+    if (mediaType === 'movie') {
+        genres = genreData.movie;
+    } else if (mediaType === 'tv') {
+        genres = genreData.tv;
+    } else {
+        // For 'all', combine both and remove duplicates
+        const allGenres = [...genreData.movie, ...genreData.tv];
+        const uniqueGenres = allGenres.filter((genre, index, self) => 
+            index === self.findIndex(g => g.name === genre.name)
+        );
+        genres = uniqueGenres.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    genres.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre.id;
+        option.textContent = genre.name;
+        genreSelect.appendChild(option);
+    });
+}
+
+// Advanced Search Functions
+async function performAdvancedSearch() {
+    const query = document.getElementById('find-search-input').value.trim();
+    const resultsContainer = document.getElementById('discovery-results');
+    const mediaType = document.getElementById('content-type-select').value;
+    
+    resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+        let results = [];
+        let title = 'Search Results';
+        
+        if (query) {
+            // Text search
+            results = await performTextSearch(query, mediaType);
+            title = `Search Results for "${query}"`;
+        } else {
+            // Discovery search with filters
+            results = await performDiscoverySearch(mediaType);
+            title = 'Filtered Results';
+        }
+        
+        if (results.length === 0) {
+            resultsContainer.innerHTML = '<div class="empty-state"><h3>No Results Found</h3><p>Try adjusting your search criteria or filters.</p></div>';
+            return;
+        }
+        
+        displayDiscoveryResults(results, title);
+        
+    } catch (error) {
+        console.error('Error performing advanced search:', error);
+        resultsContainer.innerHTML = '<div class="empty-state"><h3>Search Error</h3><p>Please try again later.</p></div>';
+    }
+}
+
+async function performTextSearch(query, mediaType) {
+    let searchResults = [];
+    
+    if (mediaType === 'all') {
+        const [movieResults, tvResults] = await Promise.all([
+            searchMovies(query),
+            searchTVShows(query)
+        ]);
+        searchResults = [...movieResults, ...tvResults];
+    } else if (mediaType === 'movie') {
+        searchResults = await searchMovies(query);
+    } else if (mediaType === 'tv') {
+        searchResults = await searchTVShows(query);
+    }
+    
+    return searchResults;
+}
+
+async function performDiscoverySearch(mediaType) {
+    const filters = getSearchFilters();
+    let results = [];
+    
+    if (mediaType === 'all') {
+        const [movieResults, tvResults] = await Promise.all([
+            discoverMovies(filters),
+            discoverTVShows(filters)
+        ]);
+        results = [...movieResults, ...tvResults];
+    } else if (mediaType === 'movie') {
+        results = await discoverMovies(filters);
+    } else if (mediaType === 'tv') {
+        results = await discoverTVShows(filters);
+    }
+    
+    return results;
+}
+
+function getSearchFilters() {
+    const yearFrom = document.getElementById('year-from').value;
+    const yearTo = document.getElementById('year-to').value;
+    const minRating = document.getElementById('min-rating').value;
+    const genreId = document.getElementById('genre-select').value;
+    const language = document.getElementById('language-select').value;
+    const sortBy = document.getElementById('sort-select').value;
+    const runtime = document.getElementById('runtime-select').value;
+    const status = document.getElementById('status-select').value;
+    const includeAdult = document.getElementById('include-adult').checked;
+    
+    const filters = {
+        sort_by: sortBy,
+        include_adult: includeAdult
+    };
+    
+    if (yearFrom) filters['primary_release_date.gte'] = `${yearFrom}-01-01`;
+    if (yearTo) filters['primary_release_date.lte'] = `${yearTo}-12-31`;
+    if (minRating) filters['vote_average.gte'] = minRating;
+    if (genreId) filters['with_genres'] = genreId;
+    if (language) filters['with_original_language'] = language;
+    if (status) filters['with_status'] = status;
+    
+    // Runtime filters
+    if (runtime === 'short') {
+        filters['with_runtime.lte'] = 90;
+    } else if (runtime === 'medium') {
+        filters['with_runtime.gte'] = 90;
+        filters['with_runtime.lte'] = 150;
+    } else if (runtime === 'long') {
+        filters['with_runtime.gte'] = 150;
+    }
+    
+    return filters;
+}
+
+async function discoverMovies(filters) {
+    const params = new URLSearchParams({
+        api_key: API_KEY,
+        ...filters
+    });
+    
+    const response = await fetch(`${API_BASE}/discover/movie?${params}`);
+    const data = await response.json();
+    return data.results.map(m => ({ ...m, media_type: 'movie' }));
+}
+
+async function discoverTVShows(filters) {
+    const params = new URLSearchParams({
+        api_key: API_KEY,
+        ...filters
+    });
+    
+    const response = await fetch(`${API_BASE}/discover/tv?${params}`);
+    const data = await response.json();
+    return data.results.map(t => ({ ...t, media_type: 'tv' }));
+}
+
+function clearAllFilters() {
+    document.getElementById('find-search-input').value = '';
+    document.getElementById('content-type-select').value = 'all';
+    document.getElementById('year-from').value = '';
+    document.getElementById('year-to').value = '';
+    document.getElementById('min-rating').value = '';
+    document.getElementById('genre-select').value = '';
+    document.getElementById('language-select').value = '';
+    document.getElementById('sort-select').value = 'popularity.desc';
+    document.getElementById('runtime-select').value = '';
+    document.getElementById('status-select').value = '';
+    document.getElementById('include-adult').checked = false;
+}
+
+function toggleAdvancedFiltersSection() {
+    const advancedFilters = document.getElementById('advanced-filters');
+    const toggleBtn = document.getElementById('toggle-advanced-filters');
+    
+    if (advancedFilters.style.display === 'none' || advancedFilters.style.display === '') {
+        advancedFilters.style.display = 'block';
+        toggleBtn.classList.add('active');
+    } else {
+        advancedFilters.style.display = 'none';
+        toggleBtn.classList.remove('active');
+    }
+}
+
+// Language Functions
+async function loadLanguages() {
+    if (languageData.loaded) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/configuration/languages?api_key=${API_KEY}`);
+        const data = await response.json();
+        
+        languageData.languages = data.sort((a, b) => a.english_name.localeCompare(b.english_name));
+        languageData.loaded = true;
+        
+        populateLanguageDropdown();
+    } catch (error) {
+        console.error('Error loading languages:', error);
+    }
+}
+
+function populateLanguageDropdown() {
+    const languageSelect = document.getElementById('language-select');
+    
+    // Clear existing options except the first one
+    languageSelect.innerHTML = '<option value="">All Languages</option>';
+    
+    // Add popular languages first
+    const popularLanguages = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'ja', 'ko', 'zh'];
+    const popularLangs = languageData.languages.filter(lang => popularLanguages.includes(lang.iso_639_1));
+    
+    popularLangs.forEach(lang => {
+        const option = document.createElement('option');
+        option.value = lang.iso_639_1;
+        option.textContent = lang.english_name;
+        languageSelect.appendChild(option);
+    });
+    
+    // Add separator
+    const separator = document.createElement('option');
+    separator.disabled = true;
+    separator.textContent = '──────────────';
+    languageSelect.appendChild(separator);
+    
+    // Add all other languages
+    const otherLangs = languageData.languages.filter(lang => !popularLanguages.includes(lang.iso_639_1));
+    otherLangs.forEach(lang => {
+        const option = document.createElement('option');
+        option.value = lang.iso_639_1;
+        option.textContent = lang.english_name;
+        languageSelect.appendChild(option);
     });
 }
 

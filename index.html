@@ -122,11 +122,109 @@
                     
                     <!-- Search Section -->
                     <div class="search-section">
+                        <!-- Main Search Row -->
                         <div class="search-input-container">
                             <input type="text" id="find-search-input" placeholder="Search for movies or TV shows..." class="search-input">
                             <button id="find-search-btn" class="search-btn">
                                 <i class="fas fa-search"></i>
                             </button>
+                        </div>
+                        
+                        <!-- Advanced Filters Toggle -->
+                        <div class="advanced-filters-toggle">
+                            <button id="toggle-advanced-filters" class="btn btn-secondary toggle-btn">
+                                <i class="fas fa-filter"></i>
+                                <span>Advanced Filters</span>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Advanced Filters (Collapsible) -->
+                        <div class="advanced-filters" id="advanced-filters" style="display: none;">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label for="content-type-select">Content Type</label>
+                                    <select id="content-type-select" class="filter-dropdown">
+                                        <option value="all">All Content</option>
+                                        <option value="movie">Movies Only</option>
+                                        <option value="tv">TV Shows Only</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="genre-select">Genre</label>
+                                    <select id="genre-select" class="filter-dropdown">
+                                        <option value="">All Genres</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="year-from">From Year</label>
+                                    <input type="number" id="year-from" class="filter-input" placeholder="1900" min="1900" max="2030">
+                                </div>
+                            </div>
+                            
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label for="year-to">To Year</label>
+                                    <input type="number" id="year-to" class="filter-input" placeholder="2024" min="1900" max="2030">
+                                </div>
+                                <div class="filter-group">
+                                    <label for="min-rating">Min Rating</label>
+                                    <input type="number" id="min-rating" class="filter-input" placeholder="0" min="0" max="10" step="0.1">
+                                </div>
+                                <div class="filter-group">
+                                    <label for="language-select">Language</label>
+                                    <select id="language-select" class="filter-dropdown">
+                                        <option value="">All Languages</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label for="sort-select">Sort By</label>
+                                    <select id="sort-select" class="filter-dropdown">
+                                        <option value="popularity.desc">Popularity</option>
+                                        <option value="vote_average.desc">Rating</option>
+                                        <option value="release_date.desc">Release Date</option>
+                                        <option value="title.asc">Title A-Z</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="runtime-select">Runtime</label>
+                                    <select id="runtime-select" class="filter-dropdown">
+                                        <option value="">Any Length</option>
+                                        <option value="short">Short (< 90 min)</option>
+                                        <option value="medium">Medium (90-150 min)</option>
+                                        <option value="long">Long (> 150 min)</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="status-select">Status</label>
+                                    <select id="status-select" class="filter-dropdown">
+                                        <option value="">Any Status</option>
+                                        <option value="released">Released</option>
+                                        <option value="upcoming">Upcoming</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="filter-row">
+                                <div class="filter-group checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="include-adult" class="filter-checkbox">
+                                        <span class="checkbox-text">Include Adult Content</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <button id="clear-filters-btn" class="btn btn-secondary clear-filters-btn">
+                                        <i class="fas fa-times"></i>
+                                        Clear All Filters
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -291,6 +389,20 @@
             <div class="modal-body">
                 <div class="movie-detail-content" id="movie-detail-content">
                     <!-- Movie details will be displayed here -->
+                </div>
+                
+                <!-- Streaming Availability Section -->
+                <div class="streaming-availability-section" id="streaming-availability-section" style="display: none;">
+                    <div class="streaming-availability-header">
+                        <h4><i class="fas fa-play-circle"></i> Where to Watch</h4>
+                        <p>Available on these streaming services</p>
+                    </div>
+                    <div class="streaming-services-grid" id="streaming-services-grid">
+                        <!-- Streaming service logos will be displayed here -->
+                    </div>
+                    <div class="streaming-unavailable" id="streaming-unavailable" style="display: none;">
+                        <p><i class="fas fa-info-circle"></i> Currently not available on major streaming services</p>
+                    </div>
                 </div>
             </div>
         </div>
