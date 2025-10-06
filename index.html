@@ -32,6 +32,10 @@
                         <i class="fas fa-random"></i>
                         Find Something to Watch
                     </button>
+                    <button class="nav-btn" data-view="news">
+                        <i class="fas fa-newspaper"></i>
+                        News
+                    </button>
                     <div class="settings-dropdown">
                         <button class="nav-btn" id="settings-nav-btn">
                             <i class="fas fa-cog"></i>
@@ -247,6 +251,62 @@
                             <i class="fas fa-search"></i>
                             <h3>Ready to Discover?</h3>
                             <p>Click one of the buttons above to start finding great content!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News View -->
+            <div id="news-view" class="view">
+                <div class="news-container">
+                    <div class="news-header">
+                        <h2>Latest Movie & TV News</h2>
+                        <p>Stay updated with the latest entertainment news</p>
+                    </div>
+                    
+                    <!-- News Categories -->
+                    <div class="news-categories">
+                        <button class="news-category-btn active" data-category="all">
+                            <i class="fas fa-globe"></i>
+                            All News
+                        </button>
+                        <button class="news-category-btn" data-category="movies">
+                            <i class="fas fa-film"></i>
+                            Movies
+                        </button>
+                        <button class="news-category-btn" data-category="tv">
+                            <i class="fas fa-tv"></i>
+                            TV Shows
+                        </button>
+                        <button class="news-category-btn" data-category="celebrities">
+                            <i class="fas fa-star"></i>
+                            Celebrities
+                        </button>
+                    </div>
+                    
+                    <!-- News Search -->
+                    <div class="news-search-container">
+                        <div class="news-search-box">
+                            <input type="text" id="news-search-input" placeholder="Search for specific news...">
+                            <button class="news-search-btn" id="news-search-btn">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- News Results -->
+                    <div class="news-results" id="news-results">
+                        <div class="news-loading" id="news-loading" style="display: none;">
+                            <div class="spinner"></div>
+                            <p>Loading latest news...</p>
+                        </div>
+                        <div class="news-error" id="news-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Failed to load news. Please try again later.</p>
+                            <button class="btn btn-primary" id="retry-news-btn">Retry</button>
+                        </div>
+                        <div class="news-grid" id="news-grid">
+                            <!-- News articles will be displayed here -->
                         </div>
                     </div>
                 </div>
