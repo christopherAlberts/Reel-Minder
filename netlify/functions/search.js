@@ -46,7 +46,11 @@ exports.handler = async (event, context) => {
     try {
         const TMDB_API_KEY = process.env.TMDB_API_KEY;
         
+        console.log('Search function called with:', { type, query });
+        console.log('API key configured:', !!TMDB_API_KEY);
+        
         if (!TMDB_API_KEY) {
+            console.error('TMDB_API_KEY not found in environment variables');
             return {
                 statusCode: 500,
                 headers,
