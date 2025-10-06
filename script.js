@@ -513,16 +513,16 @@ async function loadNewsByCategory(category = 'all') {
         let query = '';
         switch(category) {
             case 'movies':
-                query = '("movie" OR "film" OR "cinema" OR "box office" OR "Hollywood" OR "blockbuster" OR "premiere" OR "trailer" OR "sequel" OR "franchise") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                query = '("movie" OR "film" OR "cinema" OR "box office" OR "Hollywood" OR "blockbuster" OR "premiere" OR "trailer" OR "sequel" OR "franchise" OR "oscar" OR "golden globe" OR "film festival" OR "red carpet" OR "casting" OR "script" OR "screenplay") AND ("entertainment" OR "hollywood" OR "film industry" OR "movie industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
                 break;
             case 'tv':
-                query = '("TV show" OR "television series" OR "streaming" OR "Netflix" OR "HBO" OR "Disney+" OR "Amazon Prime" OR "episode" OR "season" OR "premiere") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                query = '("TV show" OR "television series" OR "streaming" OR "Netflix" OR "HBO" OR "Disney+" OR "Amazon Prime" OR "episode" OR "season" OR "premiere" OR "emmy" OR "television" OR "series" OR "episode") AND ("entertainment" OR "television industry" OR "streaming" OR "tv industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
                 break;
             case 'celebrities':
-                query = '("actor" OR "actress" OR "director" OR "producer" OR "celebrity" OR "Hollywood star" OR "movie star" OR "film star" OR "entertainment industry") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                query = '("actor" OR "actress" OR "director" OR "producer" OR "celebrity" OR "Hollywood star" OR "movie star" OR "film star" OR "entertainment industry" OR "red carpet" OR "awards" OR "oscar" OR "emmy") AND ("entertainment" OR "hollywood" OR "film industry" OR "movie industry" OR "television industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
                 break;
             default:
-                query = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                query = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming" OR "oscar" OR "emmy" OR "golden globe" OR "film festival" OR "red carpet") AND ("entertainment industry" OR "hollywood" OR "film industry" OR "movie industry" OR "television industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
         }
         
         const articles = await fetchNewsFromMultipleAPIs(query, category, currentNewsPage);
@@ -558,16 +558,16 @@ async function loadMoreNews() {
         let query = '';
         switch(currentNewsCategory) {
             case 'movies':
-                query = '("movie" OR "film" OR "cinema" OR "box office" OR "Hollywood" OR "blockbuster" OR "premiere" OR "trailer" OR "sequel" OR "franchise") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                query = '("movie" OR "film" OR "cinema" OR "box office" OR "Hollywood" OR "blockbuster" OR "premiere" OR "trailer" OR "sequel" OR "franchise" OR "oscar" OR "golden globe" OR "film festival" OR "red carpet" OR "casting" OR "script" OR "screenplay") AND ("entertainment" OR "hollywood" OR "film industry" OR "movie industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
                 break;
             case 'tv':
-                query = '("TV show" OR "television series" OR "streaming" OR "Netflix" OR "HBO" OR "Disney+" OR "Amazon Prime" OR "episode" OR "season" OR "premiere") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                query = '("TV show" OR "television series" OR "streaming" OR "Netflix" OR "HBO" OR "Disney+" OR "Amazon Prime" OR "episode" OR "season" OR "premiere" OR "emmy" OR "television" OR "series" OR "episode") AND ("entertainment" OR "television industry" OR "streaming" OR "tv industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
                 break;
             case 'celebrities':
-                query = '("actor" OR "actress" OR "director" OR "producer" OR "celebrity" OR "Hollywood star" OR "movie star" OR "film star" OR "entertainment industry") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                query = '("actor" OR "actress" OR "director" OR "producer" OR "celebrity" OR "Hollywood star" OR "movie star" OR "film star" OR "entertainment industry" OR "red carpet" OR "awards" OR "oscar" OR "emmy") AND ("entertainment" OR "hollywood" OR "film industry" OR "movie industry" OR "television industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
                 break;
             default:
-                query = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                query = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming" OR "oscar" OR "emmy" OR "golden globe" OR "film festival" OR "red carpet") AND ("entertainment industry" OR "hollywood" OR "film industry" OR "movie industry" OR "television industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
         }
         
         const newArticles = await fetchNewsFromMultipleAPIs(query, currentNewsCategory, currentNewsPage);
@@ -823,17 +823,34 @@ function removeDuplicateArticles(articles) {
 
 // Helper function to filter entertainment-related articles
 function filterEntertainmentArticles(articles) {
-    const entertainmentKeywords = [
+    const strongEntertainmentKeywords = [
         'movie', 'film', 'cinema', 'hollywood', 'actor', 'actress', 'director', 'producer',
-        'tv show', 'television', 'series', 'streaming', 'netflix', 'hbo', 'disney', 'amazon prime',
+        'tv show', 'television series', 'streaming', 'netflix', 'hbo', 'disney', 'amazon prime',
         'celebrity', 'entertainment', 'box office', 'premiere', 'trailer', 'sequel', 'franchise',
-        'episode', 'season', 'blockbuster', 'star', 'film star', 'movie star', 'entertainment industry'
+        'episode', 'season', 'blockbuster', 'film star', 'movie star', 'entertainment industry',
+        'oscar', 'emmy', 'golden globe', 'cannes', 'sundance', 'film festival', 'red carpet',
+        'casting', 'script', 'screenplay', 'cinematography', 'editing', 'soundtrack', 'score',
+        'theater', 'broadway', 'west end', 'stage', 'performance', 'audience', 'critic',
+        'review', 'rating', 'rotten tomatoes', 'imdb', 'metacritic', 'entertainment news'
     ];
     
-    const excludeKeywords = [
+    const weakEntertainmentKeywords = [
+        'star', 'show', 'series', 'television', 'streaming', 'entertainment'
+    ];
+    
+    const strongExcludeKeywords = [
         'politics', 'election', 'government', 'sports', 'football', 'basketball', 'soccer',
         'business', 'economy', 'stock', 'market', 'technology', 'tech', 'science', 'research',
-        'health', 'medical', 'covid', 'pandemic', 'war', 'conflict', 'crime', 'police'
+        'health', 'medical', 'covid', 'pandemic', 'war', 'conflict', 'crime', 'police',
+        'finance', 'banking', 'investment', 'trading', 'crypto', 'bitcoin', 'cryptocurrency',
+        'education', 'school', 'university', 'student', 'academic', 'study', 'research',
+        'environment', 'climate', 'weather', 'nature', 'animals', 'wildlife', 'conservation',
+        'food', 'restaurant', 'cooking', 'recipe', 'chef', 'dining', 'cuisine',
+        'travel', 'tourism', 'vacation', 'hotel', 'flight', 'airline', 'destination',
+        'fashion', 'clothing', 'style', 'designer', 'brand', 'retail', 'shopping',
+        'real estate', 'property', 'housing', 'mortgage', 'rent', 'apartment', 'home',
+        'automotive', 'car', 'vehicle', 'auto', 'driving', 'transportation', 'traffic',
+        'gaming', 'video game', 'console', 'playstation', 'xbox', 'nintendo', 'esports'
     ];
     
     return articles.filter(article => {
@@ -841,18 +858,41 @@ function filterEntertainmentArticles(articles) {
         const description = (article.description || '').toLowerCase();
         const content = `${title} ${description}`;
         
-        // Check if article contains entertainment keywords
-        const hasEntertainmentKeywords = entertainmentKeywords.some(keyword => 
+        // Check for strong entertainment keywords (must have at least one)
+        const hasStrongEntertainmentKeywords = strongEntertainmentKeywords.some(keyword => 
             content.includes(keyword)
         );
         
-        // Check if article contains excluded keywords
-        const hasExcludedKeywords = excludeKeywords.some(keyword => 
+        // Check for weak entertainment keywords (can supplement but not replace strong ones)
+        const hasWeakEntertainmentKeywords = weakEntertainmentKeywords.some(keyword => 
             content.includes(keyword)
         );
         
-        // Only include if it has entertainment keywords and doesn't have excluded keywords
-        return hasEntertainmentKeywords && !hasExcludedKeywords;
+        // Check if article contains strong excluded keywords
+        const hasStrongExcludedKeywords = strongExcludeKeywords.some(keyword => 
+            content.includes(keyword)
+        );
+        
+        // More strict filtering: must have strong entertainment keywords OR (weak entertainment keywords AND no strong excluded keywords)
+        const isEntertainmentContent = hasStrongEntertainmentKeywords || 
+            (hasWeakEntertainmentKeywords && !hasStrongExcludedKeywords);
+        
+        // Additional check: if it has strong excluded keywords, reject regardless
+        if (hasStrongExcludedKeywords) {
+            return false;
+        }
+        
+        // Additional context checks
+        const hasEntertainmentContext = content.includes('entertainment') || 
+            content.includes('hollywood') || 
+            content.includes('film') || 
+            content.includes('movie') ||
+            content.includes('tv') ||
+            content.includes('celebrity') ||
+            content.includes('actor') ||
+            content.includes('actress');
+        
+        return isEntertainmentContent && hasEntertainmentContext;
     });
 }
 

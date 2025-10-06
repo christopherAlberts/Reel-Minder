@@ -33,21 +33,21 @@ export default async function handler(req, res) {
         if (!searchQuery && category) {
             switch(category) {
                 case 'movies':
-                    searchQuery = '("movie" OR "film" OR "cinema" OR "box office" OR "Hollywood" OR "blockbuster" OR "premiere" OR "trailer" OR "sequel" OR "franchise") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                    searchQuery = '("movie" OR "film" OR "cinema" OR "box office" OR "Hollywood" OR "blockbuster" OR "premiere" OR "trailer" OR "sequel" OR "franchise" OR "oscar" OR "golden globe" OR "film festival" OR "red carpet" OR "casting" OR "script" OR "screenplay") AND ("entertainment" OR "hollywood" OR "film industry" OR "movie industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
                     break;
                 case 'tv':
-                    searchQuery = '("TV show" OR "television series" OR "streaming" OR "Netflix" OR "HBO" OR "Disney+" OR "Amazon Prime" OR "episode" OR "season" OR "premiere") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                    searchQuery = '("TV show" OR "television series" OR "streaming" OR "Netflix" OR "HBO" OR "Disney+" OR "Amazon Prime" OR "episode" OR "season" OR "premiere" OR "emmy" OR "television" OR "series" OR "episode") AND ("entertainment" OR "television industry" OR "streaming" OR "tv industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
                     break;
                 case 'celebrities':
-                    searchQuery = '("actor" OR "actress" OR "director" OR "producer" OR "celebrity" OR "Hollywood star" OR "movie star" OR "film star" OR "entertainment industry") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                    searchQuery = '("actor" OR "actress" OR "director" OR "producer" OR "celebrity" OR "Hollywood star" OR "movie star" OR "film star" OR "entertainment industry" OR "red carpet" OR "awards" OR "oscar" OR "emmy") AND ("entertainment" OR "hollywood" OR "film industry" OR "movie industry" OR "television industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
                     break;
                 default:
-                    searchQuery = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                    searchQuery = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming" OR "oscar" OR "emmy" OR "golden globe" OR "film festival" OR "red carpet") AND ("entertainment industry" OR "hollywood" OR "film industry" OR "movie industry" OR "television industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
             }
         }
 
         if (!searchQuery) {
-            searchQuery = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+            searchQuery = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming" OR "oscar" OR "emmy" OR "golden globe" OR "film festival" OR "red carpet") AND ("entertainment industry" OR "hollywood" OR "film industry" OR "movie industry" OR "television industry") AND NOT ("politics" OR "sports" OR "business" OR "technology" OR "science" OR "finance" OR "education" OR "health" OR "travel" OR "fashion" OR "gaming" OR "real estate" OR "automotive")';
         }
 
         // Try multiple APIs with fallback
