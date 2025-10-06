@@ -435,7 +435,11 @@ function setupEventListeners() {
 }
 
 // News functionality
+let newsEventListenersSetup = false;
+
 function setupNewsEventListeners() {
+    if (newsEventListenersSetup) return;
+    
     // News category buttons
     document.querySelectorAll('.news-category-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -473,6 +477,8 @@ function setupNewsEventListeners() {
             }
         });
     }
+    
+    newsEventListenersSetup = true;
 }
 
 // News API functions
@@ -502,7 +508,7 @@ async function loadNewsByCategory(category = 'all') {
                 query = 'entertainment OR movies OR TV OR film OR cinema OR celebrity';
         }
         
-        const articles = await fetchNewsArticles(query, category);
+        const articles = await fetchNewsFromMultipleAPIs(query, category);
         displayNewsArticles(articles);
         
     } catch (error) {
@@ -534,7 +540,7 @@ async function performNewsSearch() {
     newsError.style.display = 'none';
     
     try {
-        const articles = await fetchNewsArticles(query);
+        const articles = await fetchNewsFromMultipleAPIs(query);
         displayNewsArticles(articles);
         
     } catch (error) {
@@ -545,47 +551,73 @@ async function performNewsSearch() {
     }
 }
 
-async function fetchNewsArticles(query, category = null) {
+// Multi-API news fetching with fallback
+async function fetchNewsFromMultipleAPIs(query, category = null) {
+    const allArticles = [];
+    const errors = [];
+    
+    // Try each API in order of preference
+    const apiPromises = [
+        fetchFromNewsAPI(query, category),
+        fetchFromAPITube(query, category),
+        fetchFromZyla(query, category),
+        fetchFromNexis(query, category)
+    ];
+    
+    // Wait for all APIs to complete (or fail)
+    const results = await Promise.allSettled(apiPromises);
+    
+    // Collect successful results
+    results.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value && result.value.length > 0) {
+            allArticles.push(...result.value);
+        } else if (result.status === 'rejected') {
+            errors.push(result.reason);
+        }
+    });
+    
+    // If no articles from any API, throw an error
+    if (allArticles.length === 0) {
+        const errorMessage = errors.length > 0 
+            ? `All news APIs failed: ${errors.join(', ')}`
+            : 'No news articles found from any source';
+        throw new Error(errorMessage);
+    }
+    
+    // Remove duplicates based on title and sort by date
+    const uniqueArticles = removeDuplicateArticles(allArticles);
+    return uniqueArticles.sort((a, b) => new Date(b.publishedAt || b.pubDate || 0) - new Date(a.publishedAt || a.pubDate || 0));
+}
+
+// NewsAPI implementation
+async function fetchFromNewsAPI(query, category = null) {
+    const apiKey = window.CONFIG?.NEWS_API_KEY;
+    
+    if (!apiKey || apiKey === 'YOUR_NEWS_API_KEY_HERE') {
+        throw new Error('NewsAPI key not configured');
+    }
+    
     // Check if we're on a platform with serverless functions
     const isVercel = window.location.hostname.includes('vercel.app');
     const isNetlify = window.location.hostname.includes('netlify.app');
     const hasServerlessFunctions = isVercel || isNetlify;
     
-    let apiUrl;
-    
     if (hasServerlessFunctions) {
         // Use serverless function
-        if (isVercel) {
-            apiUrl = '/api/news';
-        } else if (isNetlify) {
-            apiUrl = '/.netlify/functions/news';
-        }
-        
+        const apiUrl = isVercel ? '/api/news' : '/.netlify/functions/news';
         const params = new URLSearchParams({ query });
-        if (category) {
-            params.append('category', category);
-        }
+        if (category) params.append('category', category);
+        
         const response = await fetch(`${apiUrl}?${params.toString()}`);
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || 'Failed to fetch news');
+            throw new Error(data.error || 'NewsAPI failed');
         }
         
-        if (data.status === 'ok') {
-            return data.articles;
-        } else {
-            throw new Error(data.message || 'Failed to fetch news');
-        }
+        return data.articles || [];
     } else {
-        // Fallback to direct API call with proxy for local development
-        const apiKey = window.CONFIG?.NEWS_API_KEY;
-        
-        if (!apiKey || apiKey === 'YOUR_NEWS_API_KEY_HERE') {
-            throw new Error('NewsAPI key not configured. Please add your NewsAPI key to config.js');
-        }
-        
-        // Use a proxy to avoid CORS issues
+        // Use proxy for local development
         const proxyUrl = 'https://api.allorigins.win/get?url=';
         const newsApiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=20&apiKey=${apiKey}`;
         
@@ -594,15 +626,122 @@ async function fetchNewsArticles(query, category = null) {
         
         if (data.contents) {
             const newsData = JSON.parse(data.contents);
-            if (newsData.status === 'ok') {
-                return newsData.articles;
-            } else {
-                throw new Error(newsData.message || 'Failed to fetch news');
-            }
-        } else {
-            throw new Error('Failed to fetch news data');
+            return newsData.articles || [];
         }
+        throw new Error('NewsAPI proxy failed');
     }
+}
+
+// APITube Movies News API implementation
+async function fetchFromAPITube(query, category = null) {
+    const apiKey = window.CONFIG?.APITUBE_API_KEY;
+    
+    if (!apiKey || apiKey === 'YOUR_APITUBE_API_KEY_HERE') {
+        throw new Error('APITube API key not configured');
+    }
+    
+    try {
+        // APITube Movies News API endpoint
+        const apiUrl = `https://api.apitube.io/v1/news/movies?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=20`;
+        
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'APITube API failed');
+        }
+        
+        // Transform APITube format to our standard format
+        return (data.articles || data.results || []).map(article => ({
+            title: article.title,
+            description: article.description || article.summary,
+            url: article.url || article.link,
+            urlToImage: article.image || article.thumbnail,
+            publishedAt: article.publishedAt || article.pubDate,
+            source: { name: article.source || 'APITube' }
+        }));
+    } catch (error) {
+        throw new Error(`APITube API error: ${error.message}`);
+    }
+}
+
+// Zyla API Hub implementation
+async function fetchFromZyla(query, category = null) {
+    const apiKey = window.CONFIG?.ZYLA_API_KEY;
+    
+    if (!apiKey || apiKey === 'YOUR_ZYLA_API_KEY_HERE') {
+        throw new Error('Zyla API key not configured');
+    }
+    
+    try {
+        // Zyla Entertainment News API endpoint
+        const apiUrl = `https://zylalabs.com/api/entertainment-news?api_key=${apiKey}&query=${encodeURIComponent(query)}&limit=20`;
+        
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Zyla API failed');
+        }
+        
+        // Transform Zyla format to our standard format
+        return (data.articles || data.results || []).map(article => ({
+            title: article.title,
+            description: article.description || article.summary,
+            url: article.url || article.link,
+            urlToImage: article.image || article.thumbnail,
+            publishedAt: article.publishedAt || article.pubDate,
+            source: { name: article.source || 'Zyla' }
+        }));
+    } catch (error) {
+        throw new Error(`Zyla API error: ${error.message}`);
+    }
+}
+
+// Nexis Data+ Movie News API implementation
+async function fetchFromNexis(query, category = null) {
+    const apiKey = window.CONFIG?.NEXIS_API_KEY;
+    
+    if (!apiKey || apiKey === 'YOUR_NEXIS_API_KEY_HERE') {
+        throw new Error('Nexis API key not configured');
+    }
+    
+    try {
+        // Nexis Data+ API endpoint (this is a placeholder - actual endpoint may vary)
+        const apiUrl = `https://api.nexis.com/v1/news/movies?api_key=${apiKey}&query=${encodeURIComponent(query)}&limit=20`;
+        
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Nexis API failed');
+        }
+        
+        // Transform Nexis format to our standard format
+        return (data.articles || data.results || []).map(article => ({
+            title: article.title,
+            description: article.description || article.summary,
+            url: article.url || article.link,
+            urlToImage: article.image || article.thumbnail,
+            publishedAt: article.publishedAt || article.pubDate,
+            source: { name: article.source || 'Nexis' }
+        }));
+    } catch (error) {
+        throw new Error(`Nexis API error: ${error.message}`);
+    }
+}
+
+// Helper function to remove duplicate articles
+function removeDuplicateArticles(articles) {
+    const seen = new Set();
+    return articles.filter(article => {
+        const key = article.title?.toLowerCase() || '';
+        if (seen.has(key)) {
+            return false;
+        }
+        seen.add(key);
+        return true;
+    });
 }
 
 function displayNewsArticles(articles) {
@@ -714,6 +853,8 @@ function switchView(viewName) {
 
     // Load news when news view is activated
     if (viewName === 'news') {
+        // Set up news event listeners if not already done
+        setupNewsEventListeners();
         // Load default news (all categories)
         loadNewsByCategory('all');
     }

@@ -8,27 +8,59 @@ The news feature has been successfully added to Reel Minder! It provides users w
 - ✅ News page with category filtering (All, Movies, TV Shows, Celebrities)
 - ✅ Search functionality for specific news topics
 - ✅ Responsive design with dark mode support
-- ✅ NewsAPI integration with fallback for local development
+- ✅ Multi-API support with automatic fallback:
+  - NewsAPI (primary, free)
+  - APITube Movies News API (specialized movie content)
+  - Zyla API Hub (multiple entertainment APIs)
+  - Nexis Data+ Movie News API (comprehensive database)
+- ✅ Automatic duplicate removal and smart sorting
+- ✅ Graceful error handling when APIs are unavailable
 
 ## Setup Instructions
 
-### 1. Get a NewsAPI Key
+### 1. Get API Keys (Optional - Multiple APIs Supported)
+
+#### NewsAPI (Primary - Free)
 1. Visit [NewsAPI.org](https://newsapi.org/)
 2. Sign up for a free account
 3. Get your API key from the dashboard
 
-### 2. Configure the API Key
+#### APITube Movies News API (Optional)
+1. Visit [APITube.io](https://apitube.io/solutions/movies-news-api)
+2. Sign up for an account
+3. Get your API key
+
+#### Zyla API Hub (Optional)
+1. Visit [Zyla Labs](https://zylalabs.com/)
+2. Sign up for an account
+3. Get your API key
+
+#### Nexis Data+ Movie News API (Optional)
+1. Visit [Nexis.com](https://www.nexis.com/)
+2. Sign up for an account
+3. Get your API key
+
+### 2. Configure the API Keys
 
 #### For Local Development:
 1. Open `config.js`
-2. Replace `YOUR_NEWS_API_KEY_HERE` with your actual NewsAPI key:
+2. Replace the placeholder keys with your actual API keys:
 ```javascript
-NEWS_API_KEY: 'your_actual_api_key_here',
+NEWS_API_KEY: 'your_newsapi_key_here',
+APITUBE_API_KEY: 'your_apitube_key_here', // Optional
+ZYLA_API_KEY: 'your_zyla_key_here', // Optional
+NEXIS_API_KEY: 'your_nexis_key_here', // Optional
 ```
 
 #### For Production (Vercel/Netlify):
-1. Add the environment variable `NEWS_API_KEY` to your deployment platform
-2. Set the value to your NewsAPI key
+1. Add the environment variables to your deployment platform:
+   - `NEWS_API_KEY`
+   - `APITUBE_API_KEY` (optional)
+   - `ZYLA_API_KEY` (optional)
+   - `NEXIS_API_KEY` (optional)
+2. Set the values to your respective API keys
+
+**Note:** The system will work with just NewsAPI. Additional APIs provide more comprehensive news coverage and better fallback options.
 
 ### 3. Deploy the API Endpoints
 
