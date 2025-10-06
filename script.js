@@ -2862,7 +2862,12 @@ let languageData = {
 
 async function loadDiscoveryContent(type, loadMore = false) {
     const resultsContainer = document.getElementById('discovery-results');
+    const trailersSection = document.getElementById('trailers-section');
     const mediaType = document.getElementById('content-type-select').value;
+    
+    // Show discovery results and hide trailers section
+    resultsContainer.style.display = 'block';
+    trailersSection.style.display = 'none';
     
     // Store the current type for filter changes
     resultsContainer.dataset.lastType = type;
@@ -3264,7 +3269,12 @@ function populateGenreDropdown() {
 async function performAdvancedSearch() {
     const query = document.getElementById('find-search-input').value.trim();
     const resultsContainer = document.getElementById('discovery-results');
+    const trailersSection = document.getElementById('trailers-section');
     const mediaType = document.getElementById('content-type-select').value;
+    
+    // Show discovery results and hide trailers section
+    resultsContainer.style.display = 'block';
+    trailersSection.style.display = 'none';
     
     resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     
