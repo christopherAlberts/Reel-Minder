@@ -262,7 +262,7 @@ function setupEventListeners() {
     document.getElementById('upcoming-btn').addEventListener('click', () => loadDiscoveryContent('upcoming'));
     document.getElementById('random-btn').addEventListener('click', () => loadDiscoveryContent('random'));
     
-    // Trailers button
+    // Trailers button (now in discovery quick buttons)
     document.getElementById('trailers-btn').addEventListener('click', () => loadTrailers());
     
     // Retry trailers button

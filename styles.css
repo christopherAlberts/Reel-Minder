@@ -2731,26 +2731,6 @@ body.dark-mode .news-load-more-btn:disabled {
     margin-bottom: 2rem;
 }
 
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 1rem;
-    margin: 1rem 0;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.action-buttons .btn {
-    min-width: 120px;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: center;
-}
-
-.action-buttons .btn i {
-    font-size: 1rem;
-}
 
 /* Trailers Section */
 .trailers-section {
