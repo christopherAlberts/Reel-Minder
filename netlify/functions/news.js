@@ -33,7 +33,7 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { query, category } = event.queryStringParameters || {};
+        const { query, category, page = '1' } = event.queryStringParameters || {};
 
         // Build search query based on category or provided query
         let searchQuery = query || '';
@@ -64,7 +64,7 @@ exports.handler = async (event, context) => {
         // Try NewsAPI first
         if (NEWS_API_KEY && NEWS_API_KEY !== 'YOUR_NEWS_API_KEY_HERE') {
             try {
-                const newsApiUrl = `${NEWS_API_BASE_URL}/everything?q=${encodeURIComponent(searchQuery)}&sortBy=publishedAt&language=en&pageSize=20&apiKey=${NEWS_API_KEY}`;
+                const newsApiUrl = `${NEWS_API_BASE_URL}/everything?q=${encodeURIComponent(searchQuery)}&sortBy=publishedAt&language=en&pageSize=20&page=${page}&apiKey=${NEWS_API_KEY}`;
                 const response = await fetch(newsApiUrl);
                 const data = await response.json();
 

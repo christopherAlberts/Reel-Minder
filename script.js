@@ -436,6 +436,10 @@ function setupEventListeners() {
 
 // News functionality
 let newsEventListenersSetup = false;
+let currentNewsCategory = 'all';
+let currentNewsPage = 1;
+let allNewsArticles = [];
+let isLoadingMoreNews = false;
 
 function setupNewsEventListeners() {
     if (newsEventListenersSetup) return;
@@ -477,6 +481,12 @@ function setupNewsEventListeners() {
             }
         });
     }
+
+    // Load more button
+    const loadMoreBtn = document.getElementById('news-load-more-btn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', loadMoreNews);
+    }
     
     newsEventListenersSetup = true;
 }
@@ -486,11 +496,18 @@ async function loadNewsByCategory(category = 'all') {
     const newsGrid = document.getElementById('news-grid');
     const newsLoading = document.getElementById('news-loading');
     const newsError = document.getElementById('news-error');
+    const loadMoreContainer = document.getElementById('news-load-more-container');
+    
+    // Reset pagination
+    currentNewsCategory = category;
+    currentNewsPage = 1;
+    allNewsArticles = [];
     
     // Show loading state
     newsGrid.innerHTML = '';
     newsLoading.style.display = 'block';
     newsError.style.display = 'none';
+    loadMoreContainer.style.display = 'none';
     
     try {
         let query = '';
@@ -508,14 +525,70 @@ async function loadNewsByCategory(category = 'all') {
                 query = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
         }
         
-        const articles = await fetchNewsFromMultipleAPIs(query, category);
+        const articles = await fetchNewsFromMultipleAPIs(query, category, currentNewsPage);
+        allNewsArticles = articles;
         displayNewsArticles(articles);
+        
+        // Show load more button if we have articles
+        if (articles.length > 0) {
+            loadMoreContainer.style.display = 'flex';
+        }
         
     } catch (error) {
         console.error('Error loading news:', error);
         showNewsError();
     } finally {
         newsLoading.style.display = 'none';
+    }
+}
+
+async function loadMoreNews() {
+    if (isLoadingMoreNews) return;
+    
+    const loadMoreBtn = document.getElementById('news-load-more-btn');
+    const loadMoreContainer = document.getElementById('news-load-more-container');
+    
+    isLoadingMoreNews = true;
+    loadMoreBtn.disabled = true;
+    loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    
+    try {
+        currentNewsPage++;
+        
+        let query = '';
+        switch(currentNewsCategory) {
+            case 'movies':
+                query = '("movie" OR "film" OR "cinema" OR "box office" OR "Hollywood" OR "blockbuster" OR "premiere" OR "trailer" OR "sequel" OR "franchise") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                break;
+            case 'tv':
+                query = '("TV show" OR "television series" OR "streaming" OR "Netflix" OR "HBO" OR "Disney+" OR "Amazon Prime" OR "episode" OR "season" OR "premiere") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                break;
+            case 'celebrities':
+                query = '("actor" OR "actress" OR "director" OR "producer" OR "celebrity" OR "Hollywood star" OR "movie star" OR "film star" OR "entertainment industry") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+                break;
+            default:
+                query = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
+        }
+        
+        const newArticles = await fetchNewsFromMultipleAPIs(query, currentNewsCategory, currentNewsPage);
+        
+        if (newArticles && newArticles.length > 0) {
+            // Add new articles to existing ones
+            allNewsArticles = [...allNewsArticles, ...newArticles];
+            displayNewsArticles(allNewsArticles);
+        } else {
+            // No more articles available
+            loadMoreContainer.style.display = 'none';
+        }
+        
+    } catch (error) {
+        console.error('Error loading more news:', error);
+        // Revert page number on error
+        currentNewsPage--;
+    } finally {
+        isLoadingMoreNews = false;
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.innerHTML = '<i class="fas fa-plus"></i> Load More News';
     }
 }
 
@@ -552,16 +625,16 @@ async function performNewsSearch() {
 }
 
 // Multi-API news fetching with fallback
-async function fetchNewsFromMultipleAPIs(query, category = null) {
+async function fetchNewsFromMultipleAPIs(query, category = null, page = 1) {
     const allArticles = [];
     const errors = [];
     
     // Try each API in order of preference
     const apiPromises = [
-        fetchFromNewsAPI(query, category),
-        fetchFromAPITube(query, category),
-        fetchFromZyla(query, category),
-        fetchFromNexis(query, category)
+        fetchFromNewsAPI(query, category, page),
+        fetchFromAPITube(query, category, page),
+        fetchFromZyla(query, category, page),
+        fetchFromNexis(query, category, page)
     ];
     
     // Wait for all APIs to complete (or fail)
@@ -591,7 +664,7 @@ async function fetchNewsFromMultipleAPIs(query, category = null) {
 }
 
 // NewsAPI implementation
-async function fetchFromNewsAPI(query, category = null) {
+async function fetchFromNewsAPI(query, category = null, page = 1) {
     const apiKey = window.CONFIG?.NEWS_API_KEY;
     
     if (!apiKey || apiKey === 'YOUR_NEWS_API_KEY_HERE') {
@@ -606,7 +679,7 @@ async function fetchFromNewsAPI(query, category = null) {
     if (hasServerlessFunctions) {
         // Use serverless function
         const apiUrl = isVercel ? '/api/news' : '/.netlify/functions/news';
-        const params = new URLSearchParams({ query });
+        const params = new URLSearchParams({ query, page: page.toString() });
         if (category) params.append('category', category);
         
         const response = await fetch(`${apiUrl}?${params.toString()}`);
@@ -620,7 +693,7 @@ async function fetchFromNewsAPI(query, category = null) {
     } else {
         // Use proxy for local development
         const proxyUrl = 'https://api.allorigins.win/get?url=';
-        const newsApiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=20&apiKey=${apiKey}`;
+        const newsApiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=20&page=${page}&apiKey=${apiKey}`;
         
         const response = await fetch(proxyUrl + encodeURIComponent(newsApiUrl));
         const data = await response.json();
@@ -634,7 +707,7 @@ async function fetchFromNewsAPI(query, category = null) {
 }
 
 // APITube Movies News API implementation
-async function fetchFromAPITube(query, category = null) {
+async function fetchFromAPITube(query, category = null, page = 1) {
     const apiKey = window.CONFIG?.APITUBE_API_KEY;
     
     if (!apiKey || apiKey === 'YOUR_APITUBE_API_KEY_HERE') {
@@ -646,7 +719,7 @@ async function fetchFromAPITube(query, category = null) {
         const movieQuery = query.includes('movie') || query.includes('film') || query.includes('cinema') 
             ? query 
             : `movie ${query}`;
-        const apiUrl = `https://api.apitube.io/v1/news/movies?api_key=${apiKey}&q=${encodeURIComponent(movieQuery)}&limit=20`;
+        const apiUrl = `https://api.apitube.io/v1/news/movies?api_key=${apiKey}&q=${encodeURIComponent(movieQuery)}&limit=20&offset=${(page - 1) * 20}`;
         
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -670,7 +743,7 @@ async function fetchFromAPITube(query, category = null) {
 }
 
 // Zyla API Hub implementation
-async function fetchFromZyla(query, category = null) {
+async function fetchFromZyla(query, category = null, page = 1) {
     const apiKey = window.CONFIG?.ZYLA_API_KEY;
     
     if (!apiKey || apiKey === 'YOUR_ZYLA_API_KEY_HERE') {
@@ -703,7 +776,7 @@ async function fetchFromZyla(query, category = null) {
 }
 
 // Nexis Data+ Movie News API implementation
-async function fetchFromNexis(query, category = null) {
+async function fetchFromNexis(query, category = null, page = 1) {
     const apiKey = window.CONFIG?.NEXIS_API_KEY;
     
     if (!apiKey || apiKey === 'YOUR_NEXIS_API_KEY_HERE') {

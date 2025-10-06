@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { query, category } = req.query;
+        const { query, category, page = '1' } = req.query;
 
         // Build search query based on category or provided query
         let searchQuery = query || '';
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
         // Try NewsAPI first
         if (NEWS_API_KEY && NEWS_API_KEY !== 'YOUR_NEWS_API_KEY_HERE') {
             try {
-                const newsApiUrl = `${NEWS_API_BASE_URL}/everything?q=${encodeURIComponent(searchQuery)}&sortBy=publishedAt&language=en&pageSize=20&apiKey=${NEWS_API_KEY}`;
+                const newsApiUrl = `${NEWS_API_BASE_URL}/everything?q=${encodeURIComponent(searchQuery)}&sortBy=publishedAt&language=en&pageSize=20&page=${page}&apiKey=${NEWS_API_KEY}`;
                 const response = await fetch(newsApiUrl);
                 const data = await response.json();
 
