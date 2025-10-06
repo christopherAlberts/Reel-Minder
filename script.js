@@ -3223,6 +3223,13 @@ async function loadGenres() {
             fetch(`${API_BASE}/genre/tv/list?api_key=${API_KEY}`)
         ]);
         
+        if (!movieResponse.ok) {
+            throw new Error(`Movie genres API failed: ${movieResponse.status}`);
+        }
+        if (!tvResponse.ok) {
+            throw new Error(`TV genres API failed: ${tvResponse.status}`);
+        }
+        
         const movieData = await movieResponse.json();
         const tvData = await tvResponse.json();
         
@@ -3230,6 +3237,9 @@ async function loadGenres() {
         genreData.tv = tvData.genres;
         genreData.loaded = true;
         
+        console.log('Genres loaded:', { movie: genreData.movie.length, tv: genreData.tv.length });
+        
+        // Populate genre dropdown after loading
         populateGenreDropdown();
     } catch (error) {
         console.error('Error loading genres:', error);
@@ -3238,7 +3248,9 @@ async function loadGenres() {
 
 function populateGenreDropdown() {
     const genreSelect = document.getElementById('genre-select');
-    const mediaType = document.querySelector('.filter-btn.active').dataset.type;
+    const mediaType = document.getElementById('content-type-select').value;
+    
+    console.log('Populating genre dropdown for media type:', mediaType);
     
     // Clear existing options except the first one
     genreSelect.innerHTML = '<option value="">All Genres</option>';
@@ -3257,12 +3269,16 @@ function populateGenreDropdown() {
         genres = uniqueGenres.sort((a, b) => a.name.localeCompare(b.name));
     }
     
+    console.log('Adding genres:', genres.length);
+    
     genres.forEach(genre => {
         const option = document.createElement('option');
         option.value = genre.id;
         option.textContent = genre.name;
         genreSelect.appendChild(option);
     });
+    
+    console.log('Genre dropdown populated with', genreSelect.options.length, 'options');
 }
 
 // Advanced Search Functions
