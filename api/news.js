@@ -33,21 +33,21 @@ export default async function handler(req, res) {
         if (!searchQuery && category) {
             switch(category) {
                 case 'movies':
-                    searchQuery = 'movies OR film OR cinema OR movie';
+                    searchQuery = '("movie" OR "film" OR "cinema" OR "box office" OR "Hollywood" OR "blockbuster" OR "premiere" OR "trailer" OR "sequel" OR "franchise") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
                     break;
                 case 'tv':
-                    searchQuery = 'TV OR television OR series OR show OR streaming';
+                    searchQuery = '("TV show" OR "television series" OR "streaming" OR "Netflix" OR "HBO" OR "Disney+" OR "Amazon Prime" OR "episode" OR "season" OR "premiere") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
                     break;
                 case 'celebrities':
-                    searchQuery = 'celebrity OR actor OR actress OR director OR producer';
+                    searchQuery = '("actor" OR "actress" OR "director" OR "producer" OR "celebrity" OR "Hollywood star" OR "movie star" OR "film star" OR "entertainment industry") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
                     break;
                 default:
-                    searchQuery = 'entertainment OR movies OR TV OR film OR cinema OR celebrity';
+                    searchQuery = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
             }
         }
 
         if (!searchQuery) {
-            searchQuery = 'entertainment OR movies OR TV OR film OR cinema OR celebrity';
+            searchQuery = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
         }
 
         // Try multiple APIs with fallback

@@ -496,16 +496,16 @@ async function loadNewsByCategory(category = 'all') {
         let query = '';
         switch(category) {
             case 'movies':
-                query = 'movies OR film OR cinema OR movie';
+                query = '("movie" OR "film" OR "cinema" OR "box office" OR "Hollywood" OR "blockbuster" OR "premiere" OR "trailer" OR "sequel" OR "franchise") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
                 break;
             case 'tv':
-                query = 'TV OR television OR series OR show OR streaming';
+                query = '("TV show" OR "television series" OR "streaming" OR "Netflix" OR "HBO" OR "Disney+" OR "Amazon Prime" OR "episode" OR "season" OR "premiere") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
                 break;
             case 'celebrities':
-                query = 'celebrity OR actor OR actress OR director OR producer';
+                query = '("actor" OR "actress" OR "director" OR "producer" OR "celebrity" OR "Hollywood star" OR "movie star" OR "film star" OR "entertainment industry") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
                 break;
             default:
-                query = 'entertainment OR movies OR TV OR film OR cinema OR celebrity';
+                query = '("movie" OR "film" OR "TV show" OR "television" OR "celebrity" OR "actor" OR "actress" OR "Hollywood" OR "entertainment" OR "cinema" OR "streaming") AND NOT ("news" OR "politics" OR "sports" OR "business" OR "technology" OR "science")';
         }
         
         const articles = await fetchNewsFromMultipleAPIs(query, category);
@@ -584,9 +584,10 @@ async function fetchNewsFromMultipleAPIs(query, category = null) {
         throw new Error(errorMessage);
     }
     
-    // Remove duplicates based on title and sort by date
+    // Remove duplicates, filter for entertainment content, and sort by date
     const uniqueArticles = removeDuplicateArticles(allArticles);
-    return uniqueArticles.sort((a, b) => new Date(b.publishedAt || b.pubDate || 0) - new Date(a.publishedAt || a.pubDate || 0));
+    const filteredArticles = filterEntertainmentArticles(uniqueArticles);
+    return filteredArticles.sort((a, b) => new Date(b.publishedAt || b.pubDate || 0) - new Date(a.publishedAt || a.pubDate || 0));
 }
 
 // NewsAPI implementation
@@ -641,8 +642,11 @@ async function fetchFromAPITube(query, category = null) {
     }
     
     try {
-        // APITube Movies News API endpoint
-        const apiUrl = `https://api.apitube.io/v1/news/movies?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=20`;
+        // APITube Movies News API endpoint - use more specific query for movies
+        const movieQuery = query.includes('movie') || query.includes('film') || query.includes('cinema') 
+            ? query 
+            : `movie ${query}`;
+        const apiUrl = `https://api.apitube.io/v1/news/movies?api_key=${apiKey}&q=${encodeURIComponent(movieQuery)}&limit=20`;
         
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -744,6 +748,56 @@ function removeDuplicateArticles(articles) {
     });
 }
 
+// Helper function to filter entertainment-related articles
+function filterEntertainmentArticles(articles) {
+    const entertainmentKeywords = [
+        'movie', 'film', 'cinema', 'hollywood', 'actor', 'actress', 'director', 'producer',
+        'tv show', 'television', 'series', 'streaming', 'netflix', 'hbo', 'disney', 'amazon prime',
+        'celebrity', 'entertainment', 'box office', 'premiere', 'trailer', 'sequel', 'franchise',
+        'episode', 'season', 'blockbuster', 'star', 'film star', 'movie star', 'entertainment industry'
+    ];
+    
+    const excludeKeywords = [
+        'politics', 'election', 'government', 'sports', 'football', 'basketball', 'soccer',
+        'business', 'economy', 'stock', 'market', 'technology', 'tech', 'science', 'research',
+        'health', 'medical', 'covid', 'pandemic', 'war', 'conflict', 'crime', 'police'
+    ];
+    
+    return articles.filter(article => {
+        const title = (article.title || '').toLowerCase();
+        const description = (article.description || '').toLowerCase();
+        const content = `${title} ${description}`;
+        
+        // Check if article contains entertainment keywords
+        const hasEntertainmentKeywords = entertainmentKeywords.some(keyword => 
+            content.includes(keyword)
+        );
+        
+        // Check if article contains excluded keywords
+        const hasExcludedKeywords = excludeKeywords.some(keyword => 
+            content.includes(keyword)
+        );
+        
+        // Only include if it has entertainment keywords and doesn't have excluded keywords
+        return hasEntertainmentKeywords && !hasExcludedKeywords;
+    });
+}
+
+// Helper function to check if a source is entertainment-related
+function isEntertainmentSource(sourceName) {
+    const entertainmentSources = [
+        'variety', 'hollywood reporter', 'deadline', 'entertainment weekly', 'ew', 'people',
+        'us weekly', 'e! online', 'tmz', 'just jared', 'popsugar', 'buzzfeed', 'vulture',
+        'av club', 'indiewire', 'screen rant', 'collider', 'movieweb', 'comingsoon',
+        'netflix', 'hbo', 'disney', 'amazon prime', 'hulu', 'paramount', 'universal',
+        'warner bros', 'sony pictures', 'fox', 'abc', 'cbs', 'nbc', 'fx', 'amc'
+    ];
+    
+    return entertainmentSources.some(source => 
+        sourceName.toLowerCase().includes(source)
+    );
+}
+
 function displayNewsArticles(articles) {
     const newsGrid = document.getElementById('news-grid');
     
@@ -769,6 +823,7 @@ function displayNewsArticles(articles) {
                 <div class="news-article-source">
                     <i class="fas fa-newspaper"></i>
                     <span>${article.source?.name || 'Unknown Source'}</span>
+                    ${article.source?.name && isEntertainmentSource(article.source.name) ? '<span class="source-badge">Entertainment</span>' : ''}
                 </div>
                 <h3 class="news-article-title">${article.title || 'No title available'}</h3>
                 <p class="news-article-description">${article.description || 'No description available'}</p>

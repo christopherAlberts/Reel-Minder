@@ -2360,6 +2360,20 @@ body.dark-mode .season-placeholder i {
     font-size: 0.7rem;
 }
 
+.source-badge {
+    background: #667eea;
+    color: white;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+body.dark-mode .source-badge {
+    background: #8b9cf7;
+}
+
 .news-article-title {
     font-size: 1.1rem;
     font-weight: 600;
