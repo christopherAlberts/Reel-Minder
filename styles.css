@@ -2226,50 +2226,6 @@ body.dark-mode .season-placeholder i {
     font-size: 1rem;
 }
 
-.content-type-filter {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-}
-
-.content-type-filter label {
-    font-weight: 600;
-    color: #333;
-    font-size: 1rem;
-}
-
-.filter-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.filter-btn {
-    padding: 0.5rem 1rem;
-    border: 2px solid #e9ecef;
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    color: #666;
-}
-
-.filter-btn:hover {
-    border-color: #667eea;
-    color: #667eea;
-}
-
-.filter-btn.active {
-    background: #667eea;
-    border-color: #667eea;
-    color: white;
-}
 
 /* Genre Dropdown Styles (now part of search container) */
 
@@ -2324,7 +2280,7 @@ body.dark-mode .season-placeholder i {
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid rgba(255, 255, 255, 0.2);
-    color: #333;
+    color: white;
     backdrop-filter: blur(10px);
 }
 
@@ -2385,7 +2341,7 @@ body.dark-mode .season-placeholder i {
 .filter-group label {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #333;
+    color: white;
     margin-bottom: 0.25rem;
 }
 
@@ -2411,41 +2367,6 @@ body.dark-mode .season-placeholder i {
     font-size: 0.85rem;
 }
 
-/* Checkbox Group */
-.checkbox-group {
-    justify-content: center;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    margin: 0;
-    padding: 0.6rem 0.8rem;
-    background: white;
-    border: 2px solid #e9ecef;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-}
-
-.checkbox-label:hover {
-    border-color: #667eea;
-    background: #f8f9fa;
-}
-
-.filter-checkbox {
-    margin: 0;
-    width: 16px;
-    height: 16px;
-    accent-color: #667eea;
-}
-
-.checkbox-text {
-    font-size: 0.9rem;
-    color: #333;
-    font-weight: 500;
-}
 
 /* Clear Filters Button */
 .clear-filters-btn {
@@ -2491,19 +2412,6 @@ body.dark-mode .filter-input::placeholder {
     color: #a0aec0;
 }
 
-body.dark-mode .checkbox-label {
-    background: #2d3748;
-    border-color: #4a5568;
-}
-
-body.dark-mode .checkbox-label:hover {
-    border-color: #667eea;
-    background: #374151;
-}
-
-body.dark-mode .checkbox-text {
-    color: #e2e8f0;
-}
 
 .search-input {
     flex: 1;
@@ -2849,30 +2757,6 @@ body.dark-mode .discovery-quick-btn i {
     color: #8b9cf7;
 }
 
-body.dark-mode .content-type-filter {
-    background: rgba(45, 55, 72, 0.5);
-}
-
-body.dark-mode .content-type-filter label {
-    color: #e2e8f0;
-}
-
-body.dark-mode .filter-btn {
-    background: #2d3748;
-    border-color: #4a5568;
-    color: #a0aec0;
-}
-
-body.dark-mode .filter-btn:hover {
-    border-color: #8b9cf7;
-    color: #8b9cf7;
-}
-
-body.dark-mode .filter-btn.active {
-    background: #8b9cf7;
-    border-color: #8b9cf7;
-    color: white;
-}
 
 /* Dark mode for genre dropdown */
 
@@ -3099,10 +2983,6 @@ body.dark-mode .library-info p {
         padding: 0.5rem 0.7rem;
     }
     
-    .checkbox-label {
-        padding: 0.5rem 0.7rem;
-        font-size: 0.85rem;
-    }
     
     .clear-filters-btn {
         width: 100%;
@@ -3110,20 +2990,6 @@ body.dark-mode .library-info p {
         font-size: 0.8rem;
     }
     
-    .content-type-filter {
-        flex-direction: column;
-        gap: 0.75rem;
-        padding: 0.75rem;
-    }
-    
-    .filter-buttons {
-        justify-content: center;
-    }
-    
-    .filter-btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
-    }
     
     
     .discovery-grid {

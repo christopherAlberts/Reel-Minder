@@ -2565,7 +2565,7 @@ function getSearchFilters() {
     const sortBy = document.getElementById('sort-select').value;
     const runtime = document.getElementById('runtime-select').value;
     const status = document.getElementById('status-select').value;
-    const includeAdult = document.getElementById('include-adult').checked;
+    const includeAdult = true; // Adult content is now always included by default
     
     const filters = {
         sort_by: sortBy,
@@ -2625,7 +2625,7 @@ function clearAllFilters() {
     document.getElementById('sort-select').value = 'popularity.desc';
     document.getElementById('runtime-select').value = '';
     document.getElementById('status-select').value = '';
-    document.getElementById('include-adult').checked = false;
+    // Adult content is now always included by default
 }
 
 function toggleAdvancedFiltersSection() {
