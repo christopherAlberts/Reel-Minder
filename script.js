@@ -262,6 +262,12 @@ function setupEventListeners() {
     document.getElementById('upcoming-btn').addEventListener('click', () => loadDiscoveryContent('upcoming'));
     document.getElementById('random-btn').addEventListener('click', () => loadDiscoveryContent('random'));
     
+    // Trailers button
+    document.getElementById('trailers-btn').addEventListener('click', () => loadTrailers());
+    
+    // Retry trailers button
+    document.getElementById('retry-trailers-btn').addEventListener('click', () => loadTrailers());
+    
     // Load More button (delegated event listener)
     document.addEventListener('click', (e) => {
         if (e.target && e.target.id === 'load-more-btn') {
@@ -912,6 +918,213 @@ function isEntertainmentSource(sourceName) {
     return entertainmentSources.some(source => 
         sourceName.toLowerCase().includes(source)
     );
+}
+
+// Trailers functionality
+async function loadTrailers() {
+    const trailersSection = document.getElementById('trailers-section');
+    const discoveryResults = document.getElementById('discovery-results');
+    const trailersLoading = document.getElementById('trailers-loading');
+    const trailersError = document.getElementById('trailers-error');
+    const trailersGrid = document.getElementById('trailers-grid');
+    
+    // Show trailers section and hide discovery results
+    trailersSection.style.display = 'block';
+    discoveryResults.style.display = 'none';
+    
+    // Show loading state
+    trailersLoading.style.display = 'block';
+    trailersError.style.display = 'none';
+    trailersGrid.innerHTML = '';
+    
+    try {
+        // Fetch latest movies and TV shows with videos
+        const [movies, tvShows] = await Promise.all([
+            fetchLatestMoviesWithVideos(),
+            fetchLatestTVShowsWithVideos()
+        ]);
+        
+        // Combine and sort by release date
+        const allContent = [...movies, ...tvShows].sort((a, b) => 
+            new Date(b.release_date || b.first_air_date || 0) - new Date(a.release_date || a.first_air_date || 0)
+        );
+        
+        displayTrailers(allContent);
+        
+    } catch (error) {
+        console.error('Error loading trailers:', error);
+        showTrailersError(error.message);
+    } finally {
+        trailersLoading.style.display = 'none';
+    }
+}
+
+async function fetchLatestMoviesWithVideos() {
+    const apiKey = window.CONFIG?.TMDB_API_KEY;
+    if (!apiKey) {
+        throw new Error('TMDB API key not configured');
+    }
+    
+    try {
+        // Fetch latest movies
+        const response = await fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US&page=1`);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.status_message || 'Failed to fetch movies');
+        }
+        
+        // Get videos for each movie
+        const moviesWithVideos = await Promise.all(
+            data.results.slice(0, 10).map(async (movie) => {
+                try {
+                    const videoResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=${apiKey}&language=en-US`);
+                    const videoData = await videoResponse.json();
+                    
+                    if (videoResponse.ok && videoData.results && videoData.results.length > 0) {
+                        // Find trailer or teaser
+                        const trailer = videoData.results.find(video => 
+                            video.type === 'Trailer' || video.type === 'Teaser'
+                        ) || videoData.results[0];
+                        
+                        return {
+                            ...movie,
+                            video: trailer,
+                            content_type: 'movie'
+                        };
+                    }
+                } catch (error) {
+                    console.warn(`Failed to fetch videos for movie ${movie.id}:`, error);
+                }
+                return null;
+            })
+        );
+        
+        return moviesWithVideos.filter(movie => movie !== null);
+        
+    } catch (error) {
+        console.error('Error fetching movies with videos:', error);
+        return [];
+    }
+}
+
+async function fetchLatestTVShowsWithVideos() {
+    const apiKey = window.CONFIG?.TMDB_API_KEY;
+    if (!apiKey) {
+        throw new Error('TMDB API key not configured');
+    }
+    
+    try {
+        // Fetch latest TV shows
+        const response = await fetch(`https://api.themoviedb.org/3/tv/on_the_air?api_key=${apiKey}&language=en-US&page=1`);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.status_message || 'Failed to fetch TV shows');
+        }
+        
+        // Get videos for each TV show
+        const tvShowsWithVideos = await Promise.all(
+            data.results.slice(0, 10).map(async (tvShow) => {
+                try {
+                    const videoResponse = await fetch(`https://api.themoviedb.org/3/tv/${tvShow.id}/videos?api_key=${apiKey}&language=en-US`);
+                    const videoData = await videoResponse.json();
+                    
+                    if (videoResponse.ok && videoData.results && videoData.results.length > 0) {
+                        // Find trailer or teaser
+                        const trailer = videoData.results.find(video => 
+                            video.type === 'Trailer' || video.type === 'Teaser'
+                        ) || videoData.results[0];
+                        
+                        return {
+                            ...tvShow,
+                            video: trailer,
+                            content_type: 'tv'
+                        };
+                    }
+                } catch (error) {
+                    console.warn(`Failed to fetch videos for TV show ${tvShow.id}:`, error);
+                }
+                return null;
+            })
+        );
+        
+        return tvShowsWithVideos.filter(tvShow => tvShow !== null);
+        
+    } catch (error) {
+        console.error('Error fetching TV shows with videos:', error);
+        return [];
+    }
+}
+
+function displayTrailers(content) {
+    const trailersGrid = document.getElementById('trailers-grid');
+    
+    if (!content || content.length === 0) {
+        trailersGrid.innerHTML = `
+            <div class="trailers-empty">
+                <i class="fas fa-video"></i>
+                <h3>No Trailers Available</h3>
+                <p>No trailers found for the latest content. Please try again later.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const trailersHTML = content.map(item => {
+        const title = item.title || item.name;
+        const releaseDate = item.release_date || item.first_air_date;
+        const overview = item.overview || 'No description available';
+        const posterPath = item.poster_path;
+        const video = item.video;
+        const contentType = item.content_type;
+        
+        const posterUrl = posterPath 
+            ? `https://image.tmdb.org/t/p/w500${posterPath}`
+            : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzUwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDM1MCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzNTAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjFGNUY0Ii8+CjxwYXRoIGQ9Ik0xNzUgMTAwTDE5MCA4NUwyMDUgMTAwTDE5MCAxMTVMMTc1IDEwMFoiIGZpbGw9IiNEOUQ5RDkiLz4KPC9zdmc+';
+        
+        const formattedDate = releaseDate ? new Date(releaseDate).toLocaleDateString() : 'TBA';
+        
+        return `
+            <div class="trailer-card">
+                <div class="trailer-thumbnail">
+                    <img src="${posterUrl}" alt="${title}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzUwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDM1MCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzNTAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjFGNUY0Ii8+CjxwYXRoIGQ9Ik0xNzUgMTAwTDE5MCA4NUwyMDUgMTAwTDE5MCAxMTVMMTc1IDEwMFoiIGZpbGw9IiNEOUQ5RDkiLz4KPC9zdmc+'">
+                    <div class="trailer-play-button" onclick="playTrailer('${video.key}', '${title}')">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+                <div class="trailer-info">
+                    <h4 class="trailer-title">${title}</h4>
+                    <div class="trailer-meta">
+                        <span class="trailer-type">${contentType === 'movie' ? 'Movie' : 'TV Show'}</span>
+                        <span class="trailer-date">${formattedDate}</span>
+                    </div>
+                    <p class="trailer-description">${overview.length > 120 ? overview.substring(0, 120) + '...' : overview}</p>
+                    <div class="trailer-actions">
+                        <button class="trailer-watch-btn" onclick="playTrailer('${video.key}', '${title}')">
+                            <i class="fas fa-play"></i>
+                            Watch Trailer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    trailersGrid.innerHTML = trailersHTML;
+}
+
+function playTrailer(videoKey, title) {
+    // Open YouTube trailer in a new tab
+    const youtubeUrl = `https://www.youtube.com/watch?v=${videoKey}`;
+    window.open(youtubeUrl, '_blank');
+}
+
+function showTrailersError(message) {
+    const trailersError = document.getElementById('trailers-error');
+    const errorText = trailersError.querySelector('p');
+    errorText.textContent = message || 'Failed to load trailers. Please try again later.';
+    trailersError.style.display = 'block';
 }
 
 function displayNewsArticles(articles) {

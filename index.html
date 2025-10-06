@@ -134,6 +134,18 @@
                             </button>
                         </div>
                         
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" id="random-btn">
+                                <i class="fas fa-random"></i>
+                                Random
+                            </button>
+                            <button class="btn btn-secondary" id="trailers-btn">
+                                <i class="fas fa-play-circle"></i>
+                                Trailers
+                            </button>
+                        </div>
+                        
                         <!-- Advanced Filters Toggle -->
                         <div class="advanced-filters-toggle">
                             <button id="toggle-advanced-filters" class="btn btn-secondary toggle-btn">
@@ -251,6 +263,29 @@
                             <i class="fas fa-search"></i>
                             <h3>Ready to Discover?</h3>
                             <p>Click one of the buttons above to start finding great content!</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Trailers Section -->
+                    <div class="trailers-section" id="trailers-section" style="display: none;">
+                        <div class="trailers-header">
+                            <h3>Latest Trailers</h3>
+                            <p>Watch the latest movie and TV show trailers</p>
+                        </div>
+                        
+                        <div class="trailers-loading" id="trailers-loading" style="display: none;">
+                            <div class="spinner"></div>
+                            <p>Loading trailers...</p>
+                        </div>
+                        
+                        <div class="trailers-error" id="trailers-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Failed to load trailers. Please try again later.</p>
+                            <button class="btn btn-primary" id="retry-trailers-btn">Retry</button>
+                        </div>
+                        
+                        <div class="trailers-grid" id="trailers-grid">
+                            <!-- Trailers will be displayed here -->
                         </div>
                     </div>
                 </div>
