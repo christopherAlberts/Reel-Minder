@@ -1,4 +1,6 @@
 // Netlify function for news API
+const fetch = require('node-fetch');
+
 const NEWS_API_KEY = process.env.NEWS_API_KEY || 'YOUR_NEWS_API_KEY_HERE';
 const APITUBE_API_KEY = process.env.APITUBE_API_KEY || 'YOUR_APITUBE_API_KEY_HERE';
 const NEXIS_API_KEY = process.env.NEXIS_API_KEY || 'YOUR_NEXIS_API_KEY_HERE';
@@ -35,6 +37,12 @@ exports.handler = async (event, context) => {
     try {
         const { query, category, page = '1' } = event.queryStringParameters || {};
 
+        console.log('News function called with:', { query, category, page });
+        console.log('API Keys status:', {
+            NEWS_API_KEY: NEWS_API_KEY !== 'YOUR_NEWS_API_KEY_HERE' ? 'SET' : 'NOT_SET',
+            APITUBE_API_KEY: APITUBE_API_KEY !== 'YOUR_APITUBE_API_KEY_HERE' ? 'SET' : 'NOT_SET'
+        });
+
         // Build search query based on category or provided query
         let searchQuery = query || '';
         if (!searchQuery && category) {
@@ -64,26 +72,39 @@ exports.handler = async (event, context) => {
         // Try NewsAPI first
         if (NEWS_API_KEY && NEWS_API_KEY !== 'YOUR_NEWS_API_KEY_HERE') {
             try {
+                console.log('Trying NewsAPI...');
                 const newsApiUrl = `${NEWS_API_BASE_URL}/everything?q=${encodeURIComponent(searchQuery)}&sortBy=publishedAt&language=en&pageSize=20&page=${page}&apiKey=${NEWS_API_KEY}`;
                 const response = await fetch(newsApiUrl);
                 const data = await response.json();
 
+                console.log('NewsAPI response:', { status: response.status, ok: response.ok, statusText: response.statusText });
+
                 if (response.ok && data.status === 'ok') {
                     allArticles.push(...(data.articles || []));
+                    console.log('NewsAPI success:', data.articles ? data.articles.length : 0, 'articles');
                 } else {
-                    errors.push('NewsAPI: ' + (data.message || 'Failed'));
+                    const errorMsg = 'NewsAPI: ' + (data.message || 'Failed');
+                    console.error(errorMsg, data);
+                    errors.push(errorMsg);
                 }
             } catch (error) {
-                errors.push('NewsAPI: ' + error.message);
+                const errorMsg = 'NewsAPI: ' + error.message;
+                console.error(errorMsg, error);
+                errors.push(errorMsg);
             }
+        } else {
+            console.log('NewsAPI key not configured');
         }
 
         // Try APITube
         if (APITUBE_API_KEY && APITUBE_API_KEY !== 'YOUR_APITUBE_API_KEY_HERE') {
             try {
+                console.log('Trying APITube...');
                 const apiUrl = `https://api.apitube.io/v1/news/movies?api_key=${APITUBE_API_KEY}&q=${encodeURIComponent(searchQuery)}&limit=20`;
                 const response = await fetch(apiUrl);
                 const data = await response.json();
+
+                console.log('APITube response:', { status: response.status, ok: response.ok, statusText: response.statusText });
 
                 if (response.ok) {
                     const articles = (data.articles || data.results || []).map(article => ({
@@ -95,12 +116,19 @@ exports.handler = async (event, context) => {
                         source: { name: article.source || 'APITube' }
                     }));
                     allArticles.push(...articles);
+                    console.log('APITube success:', articles.length, 'articles');
                 } else {
-                    errors.push('APITube: ' + (data.error || 'Failed'));
+                    const errorMsg = 'APITube: ' + (data.error || 'Failed');
+                    console.error(errorMsg, data);
+                    errors.push(errorMsg);
                 }
             } catch (error) {
-                errors.push('APITube: ' + error.message);
+                const errorMsg = 'APITube: ' + error.message;
+                console.error(errorMsg, error);
+                errors.push(errorMsg);
             }
+        } else {
+            console.log('APITube key not configured');
         }
 
         // Try Zyla API
@@ -153,8 +181,15 @@ exports.handler = async (event, context) => {
             }
         }
 
+        console.log('Final results:', { 
+            totalArticles: allArticles.length, 
+            errors: errors.length,
+            errorMessages: errors 
+        });
+
         // If no articles from any API, return error
         if (allArticles.length === 0) {
+            console.error('No articles found. Errors:', errors);
             return {
                 statusCode: 500,
                 headers,
