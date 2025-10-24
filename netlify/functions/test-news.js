@@ -1,4 +1,7 @@
 // Test function to debug news API issues
+// Use global fetch if available (Node 18+), otherwise require node-fetch
+const fetch = globalThis.fetch || require('node-fetch');
+
 const NEWS_API_KEY = process.env.NEWS_API_KEY || 'YOUR_NEWS_API_KEY_HERE';
 const APITUBE_API_KEY = process.env.APITUBE_API_KEY || 'YOUR_APITUBE_API_KEY_HERE';
 
