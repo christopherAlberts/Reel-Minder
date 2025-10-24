@@ -3082,18 +3082,6 @@ async function searchContent(query) {
     }
 }
 
-async function searchMovies(query) {
-    const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=1`);
-    const data = await response.json();
-    return data.results.map(movie => ({ ...movie, media_type: 'movie' }));
-}
-
-async function searchTVShows(query) {
-    const response = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=1`);
-    const data = await response.json();
-    return data.results.map(tv => ({ ...tv, media_type: 'tv' }));
-}
-
 function displayDiscoveryResults(items, title, loadMore = false, paginationData = null) {
     const resultsContainer = document.getElementById('discovery-results');
     
