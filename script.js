@@ -531,7 +531,7 @@ async function loadNewsByCategory(category = 'all') {
                 query = 'movie OR film OR TV show OR television OR celebrity OR actor OR actress OR Hollywood OR entertainment OR cinema OR streaming OR oscar OR emmy OR golden globe OR film festival OR red carpet';
         }
         
-        const articles = await fetchNewsFromMultipleAPIs(query, category, currentNewsPage);
+        const articles = await fetchNewsFromServerlessFunction(query, category, currentNewsPage);
         allNewsArticles = articles;
         displayNewsArticles(articles);
         
@@ -576,7 +576,7 @@ async function loadMoreNews() {
                 query = 'movie OR film OR TV show OR television OR celebrity OR actor OR actress OR Hollywood OR entertainment OR cinema OR streaming OR oscar OR emmy OR golden globe OR film festival OR red carpet';
         }
         
-        const newArticles = await fetchNewsFromMultipleAPIs(query, currentNewsCategory, currentNewsPage);
+        const newArticles = await fetchNewsFromServerlessFunction(query, currentNewsCategory, currentNewsPage);
         
         if (newArticles && newArticles.length > 0) {
             // Add new articles to existing ones
@@ -619,7 +619,7 @@ async function performNewsSearch() {
     newsError.style.display = 'none';
     
     try {
-        const articles = await fetchNewsFromMultipleAPIs(query);
+        const articles = await fetchNewsFromServerlessFunction(query);
         displayNewsArticles(articles);
         
     } catch (error) {
@@ -670,6 +670,33 @@ async function fetchNewsFromMultipleAPIs(query, category = null, page = 1) {
     const uniqueArticles = removeDuplicateArticles(allArticles);
     const filteredArticles = filterEntertainmentArticles(uniqueArticles);
     return filteredArticles.sort((a, b) => new Date(b.publishedAt || b.pubDate || 0) - new Date(a.publishedAt || a.pubDate || 0));
+}
+
+// Serverless function for news (preferred method for production)
+async function fetchNewsFromServerlessFunction(query, category = null, page = 1) {
+    // Check if we're on a platform with serverless functions
+    const isVercel = window.location.hostname.includes('vercel.app');
+    const isNetlify = window.location.hostname.includes('netlify.app');
+    const hasServerlessFunctions = isVercel || isNetlify;
+    
+    if (hasServerlessFunctions) {
+        // Use serverless function
+        const apiUrl = isVercel ? '/api/news' : '/.netlify/functions/news';
+        const params = new URLSearchParams({ query, page: page.toString() });
+        if (category) params.append('category', category);
+        
+        const response = await fetch(`${apiUrl}?${params.toString()}`);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'News serverless function failed');
+        }
+        
+        return data.articles || [];
+    } else {
+        // Fallback to direct API calls for local development
+        return await fetchNewsFromMultipleAPIs(query, category, page);
+    }
 }
 
 // NewsAPI implementation
