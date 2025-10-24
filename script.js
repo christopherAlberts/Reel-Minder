@@ -1507,7 +1507,7 @@ async function searchMovies(query) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/search?type=movie&query=${encodeURIComponent(query)}`;
+            url = isNetlify ? `/.netlify/functions/search?type=movie&query=${encodeURIComponent(query)}` : `/api/search?type=movie&query=${encodeURIComponent(query)}`;
         } else {
             url = `${API_BASE}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
         }
@@ -1525,7 +1525,7 @@ async function searchTVShows(query) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/search?type=tv&query=${encodeURIComponent(query)}`;
+            url = isNetlify ? `/.netlify/functions/search?type=tv&query=${encodeURIComponent(query)}` : `/api/search?type=tv&query=${encodeURIComponent(query)}`;
         } else {
             url = `${API_BASE}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
         }
@@ -2036,7 +2036,7 @@ async function getMovieRecommendations(movieId, mediaType) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/recommendations?type=${mediaType}&id=${movieId}`;
+            url = isNetlify ? `/.netlify/functions/recommendations?type=${mediaType}&id=${movieId}` : `/api/recommendations?type=${mediaType}&id=${movieId}`;
         } else {
             url = `${API_BASE}/${mediaType}/${movieId}/recommendations?api_key=${API_KEY}`;
         }
@@ -2062,7 +2062,7 @@ async function getGenreBasedRecommendations(topGenres) {
             // Get popular movies
             let movieUrl;
             if (hasServerlessFunctions) {
-                movieUrl = `/api/discover?type=movie&genre=${genreId}&sort=popularity.desc&page=1`;
+                movieUrl = isNetlify ? `/.netlify/functions/discover?type=movie&genre=${genreId}&sort=popularity.desc&page=1` : `/api/discover?type=movie&genre=${genreId}&sort=popularity.desc&page=1`;
             } else {
                 movieUrl = `${API_BASE}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=1`;
             }
@@ -2080,7 +2080,7 @@ async function getGenreBasedRecommendations(topGenres) {
             // Get popular TV shows
             let tvUrl;
             if (hasServerlessFunctions) {
-                tvUrl = `/api/discover?type=tv&genre=${genreId}&sort=popularity.desc&page=1`;
+                tvUrl = isNetlify ? `/.netlify/functions/discover?type=tv&genre=${genreId}&sort=popularity.desc&page=1` : `/api/discover?type=tv&genre=${genreId}&sort=popularity.desc&page=1`;
             } else {
                 tvUrl = `${API_BASE}/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=1`;
             }
@@ -2526,7 +2526,7 @@ async function fetchMovieDetails(movieId) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/details?type=movie&id=${movieId}`;
+            url = isNetlify ? `/.netlify/functions/details?type=movie&id=${movieId}` : `/api/details?type=movie&id=${movieId}`;
         } else {
             url = `${API_BASE}/movie/${movieId}?api_key=${API_KEY}`;
         }
@@ -2543,7 +2543,7 @@ async function fetchTVDetails(tvId) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/details?type=tv&id=${tvId}`;
+            url = isNetlify ? `/.netlify/functions/details?type=tv&id=${tvId}` : `/api/details?type=tv&id=${tvId}`;
         } else {
             url = `${API_BASE}/tv/${tvId}?api_key=${API_KEY}`;
         }
@@ -2560,7 +2560,7 @@ async function fetchMovieVideos(movieId) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/videos?type=movie&id=${movieId}`;
+            url = isNetlify ? `/.netlify/functions/videos?type=movie&id=${movieId}` : `/api/videos?type=movie&id=${movieId}`;
         } else {
             url = `${API_BASE}/movie/${movieId}/videos?api_key=${API_KEY}`;
         }
@@ -2577,7 +2577,7 @@ async function fetchTVVideos(tvId) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/videos?type=tv&id=${tvId}`;
+            url = isNetlify ? `/.netlify/functions/videos?type=tv&id=${tvId}` : `/api/videos?type=tv&id=${tvId}`;
         } else {
             url = `${API_BASE}/tv/${tvId}/videos?api_key=${API_KEY}`;
         }
@@ -2594,7 +2594,7 @@ async function fetchTVEpisodes(tvId) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/episodes?id=${tvId}`;
+            url = isNetlify ? `/.netlify/functions/episodes?id=${tvId}` : `/api/episodes?id=${tvId}`;
         } else {
             url = `${API_BASE}/tv/${tvId}?api_key=${API_KEY}`;
         }
@@ -2676,7 +2676,7 @@ async function loadSeasonEpisodes(tvId, seasonNumber, seasonName = null) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/season-episodes?id=${tvId}&season=${seasonNumber}`;
+            url = isNetlify ? `/.netlify/functions/season-episodes?id=${tvId}&season=${seasonNumber}` : `/api/season-episodes?id=${tvId}&season=${seasonNumber}`;
         } else {
             url = `${API_BASE}/tv/${tvId}/season/${seasonNumber}?api_key=${API_KEY}`;
         }
@@ -2748,7 +2748,7 @@ async function showEpisodeDetails(tvId, seasonNumber, episodeNumber) {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = `/api/episode-details?id=${tvId}&season=${seasonNumber}&episode=${episodeNumber}`;
+            url = isNetlify ? `/.netlify/functions/episode-details?id=${tvId}&season=${seasonNumber}&episode=${episodeNumber}` : `/api/episode-details?id=${tvId}&season=${seasonNumber}&episode=${episodeNumber}`;
         } else {
             url = `${API_BASE}/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}?api_key=${API_KEY}`;
         }
@@ -2905,7 +2905,7 @@ async function loadDiscoveryContent(type, loadMore = false) {
         switch (type) {
             case 'trending':
                 if (hasServerlessFunctions) {
-                    url = `/api/trending?media_type=${mediaType}`;
+                    url = isNetlify ? `/.netlify/functions/trending?media_type=${mediaType}` : `/api/trending?media_type=${mediaType}`;
                 } else {
                     if (mediaType === 'all') {
                         url = `${API_BASE}/trending/all/week?api_key=${API_KEY}`;
@@ -2918,7 +2918,7 @@ async function loadDiscoveryContent(type, loadMore = false) {
                 
             case 'top-rated':
                 if (hasServerlessFunctions) {
-                    url = `/api/top-rated?media_type=${mediaType}`;
+                    url = isNetlify ? `/.netlify/functions/top-rated?media_type=${mediaType}` : `/api/top-rated?media_type=${mediaType}`;
                 } else {
                     if (mediaType === 'tv') {
                         url = `${API_BASE}/tv/top_rated?api_key=${API_KEY}`;
@@ -2941,7 +2941,7 @@ async function loadDiscoveryContent(type, loadMore = false) {
                 
             case 'upcoming':
                 if (hasServerlessFunctions) {
-                    url = `/api/upcoming?media_type=${mediaType}`;
+                    url = isNetlify ? `/.netlify/functions/upcoming?media_type=${mediaType}` : `/api/upcoming?media_type=${mediaType}`;
                 } else {
                     if (mediaType === 'tv') {
                         url = `${API_BASE}/tv/on_the_air?api_key=${API_KEY}`;
@@ -2965,7 +2965,7 @@ async function loadDiscoveryContent(type, loadMore = false) {
             case 'random':
                 const randomPage = Math.floor(Math.random() * 500) + 1;
                 if (hasServerlessFunctions) {
-                    url = `/api/discover?page=${randomPage}&media_type=${mediaType}`;
+                    url = isNetlify ? `/.netlify/functions/discover?page=${randomPage}&media_type=${mediaType}` : `/api/discover?page=${randomPage}&media_type=${mediaType}`;
                 } else {
                     if (mediaType === 'tv') {
                         url = `${API_BASE}/discover/tv?api_key=${API_KEY}&page=${randomPage}`;
@@ -3235,7 +3235,7 @@ async function loadGenres() {
         let movieData, tvData;
         
         if (hasServerlessFunctions) {
-            const response = await fetch('/api/configuration?type=genres');
+            const response = await fetch(isNetlify ? '/.netlify/functions/configuration?type=genres' : '/api/configuration?type=genres');
             const data = await response.json();
             movieData = { genres: data.movie_genres };
             tvData = { genres: data.tv_genres };
@@ -3473,7 +3473,7 @@ async function loadLanguages() {
     try {
         let url;
         if (hasServerlessFunctions) {
-            url = '/api/configuration?type=languages';
+            url = isNetlify ? '/.netlify/functions/configuration?type=languages' : '/api/configuration?type=languages';
         } else {
             url = `${API_BASE}/configuration/languages?api_key=${API_KEY}`;
         }
@@ -3602,7 +3602,7 @@ async function addToSelectedLibrary(libraryId, movieId, mediaType) {
         if (!movieData) {
             let url;
             if (hasServerlessFunctions) {
-                url = `/api/details?id=${movieId}&type=${mediaType}`;
+                url = isNetlify ? `/.netlify/functions/details?id=${movieId}&type=${mediaType}` : `/api/details?id=${movieId}&type=${mediaType}`;
             } else {
                 url = `${API_BASE}/${mediaType}/${movieId}?api_key=${API_KEY}`;
             }
