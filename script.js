@@ -967,7 +967,14 @@ async function fetchLatestMoviesWithVideos() {
     
     try {
         // Fetch latest movies
-        const response = await fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US&page=1`);
+        let url;
+        if (hasServerlessFunctions) {
+            url = '/api/now-playing';
+        } else {
+            url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US&page=1`;
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         
         if (!response.ok) {
@@ -1016,7 +1023,14 @@ async function fetchLatestTVShowsWithVideos() {
     
     try {
         // Fetch latest TV shows
-        const response = await fetch(`https://api.themoviedb.org/3/tv/on_the_air?api_key=${apiKey}&language=en-US&page=1`);
+        let url;
+        if (hasServerlessFunctions) {
+            url = '/api/on-the-air';
+        } else {
+            url = `https://api.themoviedb.org/3/tv/on_the_air?api_key=${apiKey}&language=en-US&page=1`;
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         
         if (!response.ok) {
@@ -3218,20 +3232,29 @@ async function loadGenres() {
     if (genreData.loaded) return;
     
     try {
-        const [movieResponse, tvResponse] = await Promise.all([
-            fetch(`${API_BASE}/genre/movie/list?api_key=${API_KEY}`),
-            fetch(`${API_BASE}/genre/tv/list?api_key=${API_KEY}`)
-        ]);
+        let movieData, tvData;
         
-        if (!movieResponse.ok) {
-            throw new Error(`Movie genres API failed: ${movieResponse.status}`);
+        if (hasServerlessFunctions) {
+            const response = await fetch('/api/configuration?type=genres');
+            const data = await response.json();
+            movieData = { genres: data.movie_genres };
+            tvData = { genres: data.tv_genres };
+        } else {
+            const [movieResponse, tvResponse] = await Promise.all([
+                fetch(`${API_BASE}/genre/movie/list?api_key=${API_KEY}`),
+                fetch(`${API_BASE}/genre/tv/list?api_key=${API_KEY}`)
+            ]);
+            
+            if (!movieResponse.ok) {
+                throw new Error(`Movie genres API failed: ${movieResponse.status}`);
+            }
+            if (!tvResponse.ok) {
+                throw new Error(`TV genres API failed: ${tvResponse.status}`);
+            }
+            
+            movieData = await movieResponse.json();
+            tvData = await tvResponse.json();
         }
-        if (!tvResponse.ok) {
-            throw new Error(`TV genres API failed: ${tvResponse.status}`);
-        }
-        
-        const movieData = await movieResponse.json();
-        const tvData = await tvResponse.json();
         
         genreData.movie = movieData.genres;
         genreData.tv = tvData.genres;
@@ -3448,7 +3471,14 @@ async function loadLanguages() {
     if (languageData.loaded) return;
     
     try {
-        const response = await fetch(`${API_BASE}/configuration/languages?api_key=${API_KEY}`);
+        let url;
+        if (hasServerlessFunctions) {
+            url = '/api/configuration?type=languages';
+        } else {
+            url = `${API_BASE}/configuration/languages?api_key=${API_KEY}`;
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         
         languageData.languages = data.sort((a, b) => a.english_name.localeCompare(b.english_name));
